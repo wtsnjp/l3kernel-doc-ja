@@ -1,0 +1,1049 @@
+% +++
+% sequence = ["latex", "dvipdf"]
+% latex = "platex"
+% clean_files = [
+%   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
+%   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
+% ]
+% +++
+\documentclass[dvipdfmx,full,kernel]{wtpl3doc}
+
+\usepackage{bxghost}
+\newcommand{\code}[1]{\eghostguarded{\texttt{#1}}}
+
+\begin{document}
+\title{\pkg{l3int}パッケージ \\ 整数}
+%
+\author{%
+ \LaTeX3プロジェクト\thanks
+   {%
+     E-mail:
+       \href{mailto:latex-team@latex-project.org}
+         {latex-team@latex-project.org}%
+   }%
+}
+%
+\date{バージョン 2020-01-22}
+%
+\maketitle
+%
+\begin{documentation}
+%
+%Calculation and comparison of integer values can be carried out
+%using literal numbers, \texttt{int} registers, constants and
+%integers stored in token list variables. The standard operators
+%\texttt{+}, \texttt{-}, \texttt{/} and \texttt{*} and
+%parentheses can be used within such expressions to carry
+%arithmetic operations. This module carries out these functions
+%on \emph{integer expressions} (\enquote{\texttt{intexpr}}).
+%
+整数値の計算や比較は数値リテラル，\code{int}レジスタ，定数，トークン
+リストに格納された整数によって実現することができます．標準的な演算子
+\code{+}, \code{-}, \code{/}, \code{*}およびカッコはそうした表現の
+中で使用することができ，算術演算を可能にします．このモジュールは整数
+表現 (integer expressions, \enquote{\code{intexpr}}) のための関数を
+提供します．
+%
+%\section{Integer expressions}
+%
+\section{整数表現}
+%
+\begin{function}[EXP]{\int_eval:n}
+  \begin{syntax}
+    \cs{int_eval:n} \Arg{integer expression}
+  \end{syntax}
+%  Evaluates the \meta{integer expression} and leaves the result in the
+%  input stream as an integer denotation: for positive results an
+%  explicit sequence of decimal digits not starting with~\texttt{0},
+%  for negative results \texttt{-}~followed by such a sequence, and
+%  \texttt{0}~for zero.  The \meta{integer expression} should consist,
+%  after expansion, of \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/},
+%  \texttt{(}, \texttt{)} and of course integer operands.  The result
+%  is calculated by applying standard mathematical rules with the
+%  following peculiarities:
+%
+  整数表現\meta{integer expression}を評価し，その結果を入力ストリームに
+  明示的な整数値として残します．正の結果の場合は明示的な10進数，負の結果
+  の場合は\code{-}に続く明示的な10進数，そして結果が0の場合は\code{0}が
+  残ります．整数表現\meta{integer expression}は（展開された後）には整数の
+  オペランドと\code{+}, \code{-}, \code{*}, \code{/}, \code{(}, \code{)}%
+  を含めることができます．これらの演算結果は標準的な算術ルールに基づいて
+  計算されますが，以下の点には注意が必要です：
+%
+  \begin{itemize}
+%  \item \texttt{/} denotes division rounded to the closest integer with
+%    ties rounded away from zero;
+%
+  \item \code{/}は除算を行いますが，その結果は0から離れる方向で最も近い
+    整数に丸められます．
+%
+%  \item there is an error and the overall expression evaluates to zero
+%    whenever the absolute value of any intermediate result exceeds
+%    $2^{31}-1$, except in the case of scaling operations
+%    $a$\texttt{*}$b$\texttt{/}$c$, for which $a$\texttt{*}$b$ may be
+%    arbitrarily large;
+%
+  \item 演算には誤差があります．また計算の途中で$2^{31}-1$を超える結果が
+    生じた場合，最終的な計算結果は0と評価されます．ただし$a$\code{*}$b$%
+    \code{/}$c$のようなスケーリング操作については$a$\code{*}$b$の部分は
+    任意の大きさになっても大丈夫です．
+%
+%  \item parentheses may not appear after unary \texttt{+} or
+%    \texttt{-}, namely placing \texttt{+(} or \texttt{-(} at the start
+%    of an expression or after \texttt{+}, \texttt{-}, \texttt{*},
+%    \texttt{/} or~\texttt{(} leads to an error.
+%
+  \item カッコを単項演算子\code{+}, \code{-}の直後に置くことはできません．
+    すなわち表現の冒頭や\code{+}, \code{-}, \code{*}, \code{/}, \code{(}%
+    の直後に\code{+(}や\code{-(}を記述するとエラーが発生します．
+  \end{itemize}
+%
+%  Each integer operand can be either an integer variable (with no need
+%  for \cs{int_use:N}) or an integer denotation.  For example both
+%
+  整数オペランドは整数変数（\cs{int_use:N}は必要ありません）または整数
+  リテラルのいずれかです．例えば
+%
+  \begin{verbatim}
+    \int_eval:n { 5 +  4 * 3 - ( 3 + 4 * 5 ) }
+  \end{verbatim}
+%
+%  and
+%
+  および
+%
+  \begin{verbatim}
+    \tl_new:N  \l_my_tl
+    \tl_set:Nn \l_my_tl { 5 }
+    \int_new:N  \l_my_int
+    \int_set:Nn \l_my_int { 4 }
+    \int_eval:n { \l_my_tl + \l_my_int * 3 - ( 3 + 4 * 5 ) }
+  \end{verbatim}
+%
+%  evaluate to $-6$ because \cs[no-index]{l_my_tl} expands to the
+%  integer denotation~|5|.  As the \meta{integer expression} is fully
+%  expanded from left to right during evaluation, fully expandable and
+%  restricted-expandable functions can both be used, and \cs{exp_not:n}
+%  and its variants have no effect while \cs{exp_not:N} may incorrectly
+%  interrupt the expression.
+%
+  はいずれも$-6$と評価されます．なぜなら\cs[no-index]{l_my_tl}は整数リテ
+  ラル\code{5}に展開されるためです．評価の際，整数表現\meta{integer
+  expression}は左から右に向かって完全展開されるため，整数表現の中では
+  完全展開可能な関数も制限付き完全展開可能な関数も使用することができます．
+  また\cs{exp_not:n}およびその変種は効果がありません．これは\cs{exp_not:N}%
+  が不用意に展開の邪魔をすることを防ぐためです．
+%
+  \begin{texnote}
+%    Exactly two expansions are needed to evaluate \cs{int_eval:n}.
+%    The result is \emph{not} an \meta{internal integer}, and therefore
+%    requires suitable termination if used in a \TeX{}-style integer
+%    assignment.
+%
+    \cs{int_eval:n}の評価にはちょうど2回の展開が必要です．評価結果は
+    \meta{internal integer}では\emph{ない}ため\TeX 言語スタイルの代入を
+    行う場合には適当な終了点明示が必要となります．
+%
+%    As all \TeX{} integers, integer operands can also be dimension or
+%    skip variables, converted to integers in~\texttt{sp}, or octal
+%    numbers given as \texttt{'} followed by digits other than
+%    \texttt{8} and \texttt{9}, or hexadecimal numbers given as
+%    |"| followed by digits or upper case letters from
+%    \texttt{A} to~\texttt{F}, or the character code of some character
+%    or one-character control sequence, given as \texttt{`}\meta{char}.
+%
+    \TeX における他のすべての整数と同様，整数オペランドは寸法やスキップ
+    の変数（これらは\code{sp}単位の整数値に変換されます），\code{'}に
+    続く8進数，|"|\eghost に続く16進数，あるいは\code{`}\meta{char}の
+    形で表される文字コードでも構いません．
+  \end{texnote}
+\end{function}
+%
+\begin{function}[EXP, added = 2018-03-30]{\int_eval:w}
+  \begin{syntax}
+    \cs{int_eval:w} \meta{integer expression}
+  \end{syntax}
+  Evaluates the \meta{integer expression} as described for
+  \cs{int_eval:n}. The end of the expression is the first token
+  encountered that cannot form part of such an expression.  If that
+  token is \cs{scan_stop:} it is removed, otherwise not.  Spaces do
+  \emph{not} terminate the expression.  However, spaces terminate
+  explict integers, and this may terminate the expression: for
+  instance, \cs{int_eval:w} \verb*|1 + 1 9| expands to \texttt{29}
+  since the digit~\texttt{9} is not part of the expression.
+\end{function}
+%
+\begin{function}[EXP, added = 2018-11-03]{\int_sign:n}
+  \begin{syntax}
+    \cs{int_sign:n} \Arg{intexpr}
+  \end{syntax}
+  Evaluates the \meta{integer expression} then leaves $1$ or $0$ or
+  $-1$ in the input stream according to the sign of the result.
+\end{function}
+%
+\begin{function}[EXP, updated = 2012-09-26]{\int_abs:n}
+  \begin{syntax}
+    \cs{int_abs:n} \Arg{integer expression}
+  \end{syntax}
+  Evaluates the \meta{integer expression} as described for
+  \cs{int_eval:n} and leaves the absolute value of the result in
+  the input stream as an \meta{integer denotation} after two
+  expansions.
+\end{function}
+%
+\begin{function}[EXP, updated = 2012-09-26]{\int_div_round:nn}
+  \begin{syntax}
+    \cs{int_div_round:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+  \end{syntax}
+  Evaluates the two \meta{integer expressions} as described earlier,
+  then divides the first value by the second, and rounds the result
+  to the closest integer.  Ties are rounded away from zero.
+  Note that this is identical to using
+  |/| directly in an \meta{integer expression}. The result is left in
+  the input stream as an \meta{integer denotation} after two expansions.
+\end{function}
+%
+\begin{function}[EXP, updated = 2012-02-09]{\int_div_truncate:nn}
+  \begin{syntax}
+    \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+  \end{syntax}
+  Evaluates the two \meta{integer expressions} as described earlier,
+  then divides the first value by the second, and rounds the result
+  towards zero.  Note that division using |/|
+  rounds to the closest integer instead.
+  The result is left in the input stream as an
+  \meta{integer denotation} after two expansions.
+\end{function}
+%
+\begin{function}[EXP, updated = 2012-09-26]{\int_max:nn, \int_min:nn}
+  \begin{syntax}
+    \cs{int_max:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+    \cs{int_min:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+  \end{syntax}
+  Evaluates the \meta{integer expressions} as described for
+  \cs{int_eval:n} and leaves either the larger or smaller value
+  in the input stream as an \meta{integer denotation} after two
+  expansions.
+\end{function}
+%
+\begin{function}[EXP, updated = 2012-09-26]{\int_mod:nn}
+  \begin{syntax}
+    \cs{int_mod:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+  \end{syntax}
+  Evaluates the two \meta{integer expressions} as described earlier,
+  then calculates the integer remainder of dividing the first
+  expression by the second.  This is obtained by subtracting
+  \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2} times
+  \meta{intexpr_2} from \meta{intexpr_1}.  Thus, the result has the
+  same sign as \meta{intexpr_1} and its absolute value is strictly
+  less than that of \meta{intexpr_2}.  The result is left in the input
+  stream as an \meta{integer denotation} after two expansions.
+\end{function}
+%
+\section{Creating and initialising integers}
+%
+\begin{function}{\int_new:N, \int_new:c}
+  \begin{syntax}
+    \cs{int_new:N} \meta{integer}
+  \end{syntax}
+  Creates a new \meta{integer} or raises an error if the name is
+  already taken. The declaration is global. The \meta{integer} is
+  initially equal to $0$.
+\end{function}
+%
+\begin{function}[updated = 2011-10-22]{\int_const:Nn, \int_const:cn}
+  \begin{syntax}
+    \cs{int_const:Nn} \meta{integer} \Arg{integer expression}
+  \end{syntax}
+  Creates a new constant \meta{integer} or raises an error if the name
+  is already taken. The value of the \meta{integer} is set
+  globally to the \meta{integer expression}.
+\end{function}
+%
+\begin{function}{\int_zero:N, \int_zero:c, \int_gzero:N, \int_gzero:c}
+  \begin{syntax}
+    \cs{int_zero:N} \meta{integer}
+  \end{syntax}
+  Sets \meta{integer} to $0$.
+\end{function}
+%
+\begin{function}[added = 2011-12-13]
+  {\int_zero_new:N, \int_zero_new:c, \int_gzero_new:N, \int_gzero_new:c}
+  \begin{syntax}
+    \cs{int_zero_new:N} \meta{integer}
+  \end{syntax}
+  Ensures that the \meta{integer} exists globally by applying
+  \cs{int_new:N} if necessary, then applies
+  \cs[index=int_zero:N]{int_(g)zero:N} to leave
+  the \meta{integer} set to zero.
+\end{function}
+%
+\begin{function}
+  {
+    \int_set_eq:NN,  \int_set_eq:cN,  \int_set_eq:Nc,  \int_set_eq:cc,
+    \int_gset_eq:NN, \int_gset_eq:cN, \int_gset_eq:Nc, \int_gset_eq:cc
+  }
+  \begin{syntax}
+    \cs{int_set_eq:NN} \meta{integer_1} \meta{integer_2}
+  \end{syntax}
+  Sets the content of \meta{integer_1} equal to that of
+  \meta{integer_2}.
+\end{function}
+%
+\begin{function}[EXP, pTF, added=2012-03-03]
+  {\int_if_exist:N, \int_if_exist:c}
+  \begin{syntax}
+    \cs{int_if_exist_p:N} \meta{int}
+    \cs{int_if_exist:NTF} \meta{int} \Arg{true code} \Arg{false code}
+  \end{syntax}
+  Tests whether the \meta{int} is currently defined.  This does not
+  check that the \meta{int} really is an integer variable.
+\end{function}
+%
+\section{Setting and incrementing integers}
+%
+\begin{function}[updated = 2011-10-22]
+  {\int_add:Nn, \int_add:cn, \int_gadd:Nn, \int_gadd:cn}
+  \begin{syntax}
+    \cs{int_add:Nn} \meta{integer} \Arg{integer expression}
+  \end{syntax}
+  Adds the result of the \meta{integer expression} to the current
+  content of the \meta{integer}.
+\end{function}
+%
+\begin{function}{\int_decr:N, \int_decr:c, \int_gdecr:N, \int_gdecr:c}
+  \begin{syntax}
+    \cs{int_decr:N} \meta{integer}
+  \end{syntax}
+  Decreases the value stored in \meta{integer} by $1$.
+\end{function}
+%
+\begin{function}{\int_incr:N, \int_incr:c, \int_gincr:N, \int_gincr:c}
+  \begin{syntax}
+    \cs{int_incr:N} \meta{integer}
+  \end{syntax}
+  Increases the value stored in \meta{integer} by $1$.
+\end{function}
+%
+\begin{function}[updated = 2011-10-22]
+  {\int_set:Nn, \int_set:cn, \int_gset:Nn, \int_gset:cn}
+  \begin{syntax}
+    \cs{int_set:Nn} \meta{integer} \Arg{integer expression}
+  \end{syntax}
+  Sets \meta{integer} to the value of \meta{integer expression},
+  which must evaluate to an integer (as described for
+  \cs{int_eval:n}).
+\end{function}
+%
+\begin{function}[updated = 2011-10-22]
+  {\int_sub:Nn, \int_sub:cn, \int_gsub:Nn, \int_gsub:cn}
+  \begin{syntax}
+    \cs{int_sub:Nn} \meta{integer} \Arg{integer expression}
+  \end{syntax}
+  Subtracts the result of the \meta{integer expression} from the
+  current content of the \meta{integer}.
+\end{function}
+%
+\section{Using integers}
+%
+\begin{function}[updated = 2011-10-22, EXP]{\int_use:N, \int_use:c}
+  \begin{syntax}
+    \cs{int_use:N} \meta{integer}
+  \end{syntax}
+  Recovers the content of an \meta{integer} and places it directly
+  in the input stream. An error is raised if the variable does
+  not exist or if it is invalid. Can be omitted in places where an
+  \meta{integer} is required (such as in the first and third arguments
+  of \cs{int_compare:nNnTF}).
+  \begin{texnote}
+    \cs{int_use:N} is the \TeX{} primitive \tn{the}: this is one of
+    several \LaTeX3 names for this primitive.
+  \end{texnote}
+\end{function}
+%
+\section{Integer expression conditionals}
+%
+\begin{function}[EXP,pTF]{\int_compare:nNn}
+  \begin{syntax}
+    \cs{int_compare_p:nNn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \\
+    \cs{int_compare:nNnTF}
+    ~~\Arg{intexpr_1} \meta{relation} \Arg{intexpr_2}
+    ~~\Arg{true code} \Arg{false code}
+  \end{syntax}
+  This function first evaluates each of the \meta{integer expressions}
+  as described for \cs{int_eval:n}. The two results are then
+  compared using the \meta{relation}:
+  \begin{center}
+    \begin{tabular}{ll}
+      Equal                 & |=| \\
+      Greater than          & |>| \\
+      Less than             & |<| \\
+    \end{tabular}
+  \end{center}
+  This function is less flexible than \cs{int_compare:nTF} but around
+  $5$~times faster.
+\end{function}
+%
+\begin{function}[updated = 2013-01-13, EXP, pTF]{\int_compare:n}
+  \begin{syntax}
+    \cs{int_compare_p:n} \\
+    ~~\{ \\
+    ~~~~\meta{intexpr_1} \meta{relation_1} \\
+    ~~~~\ldots{} \\
+    ~~~~\meta{intexpr_N} \meta{relation_N} \\
+    ~~~~\meta{intexpr_{N+1}} \\
+    ~~\} \\
+    \cs{int_compare:nTF}
+    ~~\{ \\
+    ~~~~\meta{intexpr_1} \meta{relation_1} \\
+    ~~~~\ldots{} \\
+    ~~~~\meta{intexpr_N} \meta{relation_N} \\
+    ~~~~\meta{intexpr_{N+1}} \\
+    ~~\} \\
+    ~~\Arg{true code} \Arg{false code}
+  \end{syntax}
+  This function evaluates the \meta{integer expressions} as described
+  for \cs{int_eval:n} and compares consecutive result using the
+  corresponding \meta{relation}, namely it compares \meta{intexpr_1}
+  and \meta{intexpr_2} using the \meta{relation_1}, then
+  \meta{intexpr_2} and \meta{intexpr_3} using the \meta{relation_2},
+  until finally comparing \meta{intexpr_N} and \meta{intexpr_{N+1}}
+  using the \meta{relation_N}.  The test yields \texttt{true} if all
+  comparisons are \texttt{true}.  Each \meta{integer expression} is
+  evaluated only once, and the evaluation is lazy, in the sense that
+  if one comparison is \texttt{false}, then no other \meta{integer
+    expression} is evaluated and no other comparison is performed.
+  The \meta{relations} can be any of the following:
+  \begin{center}
+    \begin{tabular}{ll}
+      Equal                    & |=| or |==| \\
+      Greater than or equal to & |>=|        \\
+      Greater than             & |>|         \\
+      Less than or equal to    & |<=|        \\
+      Less than                & |<|         \\
+      Not equal                & |!=|        \\
+    \end{tabular}
+  \end{center}
+  This function is more flexible than \cs{int_compare:nNnTF} but
+  around $5$~times slower.
+\end{function}
+%
+\begin{function}[added = 2013-07-24, EXP, noTF]{\int_case:nn}
+  \begin{syntax}
+    \cs{int_case:nnTF} \Arg{test integer expression} \\
+    ~~|{| \\
+    ~~~~\Arg{intexpr case_1} \Arg{code case_1} \\
+    ~~~~\Arg{intexpr case_2} \Arg{code case_2} \\
+    ~~~~\ldots \\
+    ~~~~\Arg{intexpr case_n} \Arg{code case_n} \\
+    ~~|}| \\
+    ~~\Arg{true code}
+    ~~\Arg{false code}
+  \end{syntax}
+  This function evaluates the \meta{test integer expression} and
+  compares this in turn to each of the
+  \meta{integer expression cases}. If the two are equal then the
+  associated \meta{code} is left in the input stream
+  and other cases are discarded. If any of the
+  cases are matched, the \meta{true code} is also inserted into the
+  input stream (after the code for the appropriate case), while if none
+  match then the \meta{false code} is inserted. The function
+  \cs{int_case:nn}, which does nothing if there is no match, is also
+  available. For example
+  \begin{verbatim}
+    \int_case:nnF
+      { 2 * 5 }
+      {
+        { 5 }       { Small }
+        { 4 + 6 }   { Medium }
+        { -2 * 10 } { Negative }
+      }
+      { No idea! }
+  \end{verbatim}
+  leaves \enquote{\texttt{Medium}} in the input stream.
+\end{function}
+%
+\begin{function}[EXP,pTF]{\int_if_even:n, \int_if_odd:n}
+  \begin{syntax}
+    \cs{int_if_odd_p:n} \Arg{integer expression}
+    \cs{int_if_odd:nTF} \Arg{integer expression}
+    ~~\Arg{true code} \Arg{false code}
+  \end{syntax}
+  This function first evaluates the \meta{integer expression}
+  as described for \cs{int_eval:n}. It then evaluates if this
+  is odd or even, as appropriate.
+\end{function}
+%
+\section{Integer expression loops}
+%
+\begin{function}[rEXP]{\int_do_until:nNnn}
+  \begin{syntax}
+     \cs{int_do_until:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
+  \end{syntax}
+  Places the \meta{code} in the input stream for \TeX{} to process, and
+  then evaluates the relationship between the two
+  \meta{integer expressions} as described for \cs{int_compare:nNnTF}.
+  If the test is \texttt{false} then the \meta{code} is inserted
+  into the input stream again and a loop occurs until the
+  \meta{relation} is \texttt{true}.
+\end{function}
+%
+\begin{function}[rEXP]{\int_do_while:nNnn}
+  \begin{syntax}
+     \cs{int_do_while:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
+  \end{syntax}
+  Places the \meta{code} in the input stream for \TeX{} to process, and
+  then evaluates the relationship between the two
+  \meta{integer expressions} as described for \cs{int_compare:nNnTF}.
+  If the test is \texttt{true} then the \meta{code} is inserted
+  into the input stream again and a loop occurs until the
+  \meta{relation} is \texttt{false}.
+\end{function}
+%
+\begin{function}[rEXP]{\int_until_do:nNnn}
+  \begin{syntax}
+     \cs{int_until_do:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
+  \end{syntax}
+  Evaluates the relationship between the two \meta{integer expressions}
+  as described for \cs{int_compare:nNnTF}, and then places the
+  \meta{code} in the input stream if the \meta{relation} is
+  \texttt{false}. After the \meta{code} has been processed by \TeX{} the
+  test is repeated, and a loop occurs until the test is
+  \texttt{true}.
+\end{function}
+%
+\begin{function}[rEXP]{\int_while_do:nNnn}
+  \begin{syntax}
+     \cs{int_while_do:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
+  \end{syntax}
+  Evaluates the relationship between the two \meta{integer expressions}
+  as described for \cs{int_compare:nNnTF}, and then places the
+  \meta{code} in the input stream if the \meta{relation} is
+  \texttt{true}. After the \meta{code} has been processed by \TeX{} the
+  test is repeated, and a loop occurs until the test is
+  \texttt{false}.
+\end{function}
+%
+\begin{function}[updated = 2013-01-13, rEXP]{\int_do_until:nn}
+  \begin{syntax}
+     \cs{int_do_until:nn} \Arg{integer relation} \Arg{code}
+  \end{syntax}
+  Places the \meta{code} in the input stream for \TeX{} to process, and
+  then evaluates the \meta{integer relation}
+  as described for \cs{int_compare:nTF}.
+  If the test is \texttt{false} then the \meta{code} is inserted
+  into the input stream again and a loop occurs until the
+  \meta{relation} is \texttt{true}.
+\end{function}
+%
+\begin{function}[updated = 2013-01-13, rEXP]{\int_do_while:nn}
+  \begin{syntax}
+     \cs{int_do_while:nn} \Arg{integer relation} \Arg{code}
+  \end{syntax}
+  Places the \meta{code} in the input stream for \TeX{} to process, and
+  then evaluates the \meta{integer relation}
+  as described for \cs{int_compare:nTF}.
+  If the test is \texttt{true} then the \meta{code} is inserted
+  into the input stream again and a loop occurs until the
+  \meta{relation} is \texttt{false}.
+\end{function}
+%
+\begin{function}[updated = 2013-01-13, rEXP]{\int_until_do:nn}
+  \begin{syntax}
+     \cs{int_until_do:nn} \Arg{integer relation} \Arg{code}
+  \end{syntax}
+  Evaluates the \meta{integer relation}
+  as described for \cs{int_compare:nTF}, and then places the
+  \meta{code} in the input stream if the \meta{relation} is
+  \texttt{false}. After the \meta{code} has been processed by \TeX{} the
+  test is repeated, and a loop occurs until the test is
+  \texttt{true}.
+\end{function}
+%
+\begin{function}[updated = 2013-01-13, rEXP]{\int_while_do:nn}
+  \begin{syntax}
+     \cs{int_while_do:nn} \Arg{integer relation} \Arg{code}
+  \end{syntax}
+  Evaluates the \meta{integer relation}
+  as described for \cs{int_compare:nTF}, and then places the
+  \meta{code} in the input stream if the \meta{relation} is
+  \texttt{true}. After the \meta{code} has been processed by \TeX{} the
+  test is repeated, and a loop occurs until the test is
+  \texttt{false}.
+\end{function}
+%
+\section{Integer step functions}
+%
+\begin{function}[added = 2012-06-04, updated = 2018-04-22, rEXP]
+  {\int_step_function:nN, \int_step_function:nnN, \int_step_function:nnnN}
+  \begin{syntax}
+    \cs{int_step_function:nN} \Arg{final value} \meta{function}
+    \cs{int_step_function:nnN} \Arg{initial value} \Arg{final value} \meta{function}
+    \cs{int_step_function:nnnN} \Arg{initial value} \Arg{step} \Arg{final value} \meta{function}
+  \end{syntax}
+  This function first evaluates the \meta{initial value}, \meta{step}
+  and \meta{final value}, all of which should be integer expressions.
+  The \meta{function} is then placed in front of each \meta{value}
+  from the \meta{initial value} to the \meta{final value} in turn
+  (using \meta{step} between each \meta{value}).  The \meta{step} must
+  be non-zero.  If the \meta{step} is positive, the loop stops when
+  the \meta{value} becomes larger than the \meta{final value}.  If the
+  \meta{step} is negative, the loop stops when the \meta{value}
+  becomes smaller than the \meta{final value}.  The \meta{function}
+  should absorb one numerical argument. For example
+  \begin{verbatim}
+    \cs_set:Npn \my_func:n #1 { [I~saw~#1] \quad }
+    \int_step_function:nnnN { 1 } { 1 } { 5 } \my_func:n
+  \end{verbatim}
+  would print
+  \begin{quote}
+    [I saw 1] \quad
+    [I saw 2] \quad
+    [I saw 3] \quad
+    [I saw 4] \quad
+    [I saw 5] \quad
+  \end{quote}
+%
+  The functions \cs{int_step_function:nN} and \cs{int_step_function:nnN}
+  both use a fixed \meta{step} of $1$, and in the case of
+  \cs{int_step_function:nN} the \meta{initial value} is also fixed as
+  $1$. These functions are provided as simple short-cuts for code clarity.
+\end{function}
+%
+\begin{function}[added = 2012-06-04, updated = 2018-04-22]
+  {\int_step_inline:nn, \int_step_inline:nnn, \int_step_inline:nnnn}
+  \begin{syntax}
+    \cs{int_step_inline:nn} \Arg{final value} \Arg{code}
+    \cs{int_step_inline:nnn} \Arg{initial value} \Arg{final value} \Arg{code}
+    \cs{int_step_inline:nnnn} \Arg{initial value} \Arg{step} \Arg{final value} \Arg{code}
+  \end{syntax}
+  This function first evaluates the \meta{initial value}, \meta{step}
+  and \meta{final value}, all of which should be integer expressions.
+  Then for each \meta{value} from the \meta{initial value} to the
+  \meta{final value} in turn (using \meta{step} between each
+  \meta{value}), the \meta{code} is inserted into the input stream
+  with |#1| replaced by the current \meta{value}.  Thus the
+  \meta{code} should define a function of one argument~(|#1|).
+%
+  The functions \cs{int_step_inline:nn} and \cs{int_step_inline:nnn}
+  both use a fixed \meta{step} of $1$, and in the case of
+  \cs{int_step_inline:nn} the \meta{initial value} is also fixed as
+  $1$. These functions are provided as simple short-cuts for code clarity.
+\end{function}
+%
+\begin{function}[added = 2012-06-04, updated = 2018-04-22]
+  {\int_step_variable:nNn, \int_step_variable:nnNn, \int_step_variable:nnnNn}
+  \begin{syntax}
+    \cs{int_step_variable:nNn} \Arg{final value} \meta{tl~var} \Arg{code}
+    \cs{int_step_variable:nnNn} \Arg{initial value} \Arg{final value} \meta{tl~var} \Arg{code}
+    \cs{int_step_variable:nnnNn} \Arg{initial value} \Arg{step} \Arg{final value} \meta{tl~var} \Arg{code}
+  \end{syntax}
+  This function first evaluates the \meta{initial value}, \meta{step}
+  and \meta{final value}, all of which should be integer expressions.
+  Then for each \meta{value} from the \meta{initial value} to the
+  \meta{final value} in turn (using \meta{step} between each
+  \meta{value}), the \meta{code} is inserted into the input stream,
+  with the \meta{tl~var} defined as the current \meta{value}.  Thus
+  the \meta{code} should make use of the \meta{tl~var}.
+%
+  The functions \cs{int_step_variable:nNn} and \cs{int_step_variable:nnNn}
+  both use a fixed \meta{step} of $1$, and in the case of
+  \cs{int_step_variable:nNn} the \meta{initial value} is also fixed as
+  $1$. These functions are provided as simple short-cuts for code clarity.
+\end{function}
+%
+\section{Formatting integers}
+%
+Integers can be placed into the output stream with formatting. These
+conversions apply to any integer expressions.
+%
+\begin{function}[updated = 2011-10-22, EXP]{\int_to_arabic:n}
+  \begin{syntax}
+    \cs{int_to_arabic:n} \Arg{integer expression}
+  \end{syntax}
+  Places the value of the \meta{integer expression} in the input
+  stream as digits, with category code $12$ (other).
+\end{function}
+%
+\begin{function}[updated = 2011-09-17, EXP]{\int_to_alph:n, \int_to_Alph:n}
+  \begin{syntax}
+    \cs{int_to_alph:n} \Arg{integer expression}
+  \end{syntax}
+  Evaluates the \meta{integer expression} and converts the result
+  into a series of letters, which are then left in the input stream.
+  The conversion rule uses the $26$ letters of the English
+  alphabet, in order, adding letters when necessary to increase the total
+  possible range of representable numbers. Thus
+  \begin{verbatim}
+    \int_to_alph:n { 1 }
+  \end{verbatim}
+  places |a| in the input stream,
+  \begin{verbatim}
+    \int_to_alph:n { 26 }
+  \end{verbatim}
+  is represented as |z| and
+  \begin{verbatim}
+    \int_to_alph:n { 27 }
+  \end{verbatim}
+  is converted to |aa|. For conversions using other alphabets, use
+  \cs{int_to_symbols:nnn} to define an alphabet-specific
+  function. The basic \cs{int_to_alph:n} and \cs{int_to_Alph:n}
+  functions should not be modified.
+  The resulting tokens are digits with category code $12$ (other) and
+  letters with category code $11$ (letter).
+\end{function}
+%
+\begin{function}[updated = 2011-09-17, EXP]{\int_to_symbols:nnn}
+  \begin{syntax}
+    \cs{int_to_symbols:nnn}
+    ~~\Arg{integer expression} \Arg{total symbols}
+    ~~\Arg{value to symbol mapping}
+  \end{syntax}
+  This is the low-level function for conversion of an
+  \meta{integer expression} into a symbolic form (often
+  letters). The \meta{total symbols} available should be given
+  as an integer expression. Values are actually converted to symbols
+  according to the \meta{value to symbol mapping}. This should be given
+  as \meta{total symbols} pairs of entries, a number and the
+  appropriate symbol. Thus the \cs{int_to_alph:n} function is defined
+  as
+  \begin{verbatim}
+    \cs_new:Npn \int_to_alph:n #1
+      {
+        \int_to_symbols:nnn {#1} { 26 }
+          {
+            {  1 } { a }
+            {  2 } { b }
+            ...
+            { 26 } { z }
+          }
+      }
+  \end{verbatim}
+\end{function}
+%
+\begin{function}[added = 2014-02-11, EXP]{\int_to_bin:n}
+  \begin{syntax}
+    \cs{int_to_bin:n} \Arg{integer expression}
+  \end{syntax}
+  Calculates the value of the \meta{integer expression} and places
+  the binary representation of the result in the input stream.
+\end{function}
+%
+\begin{function}[added = 2014-02-11, EXP]{\int_to_hex:n, \int_to_Hex:n}
+  \begin{syntax}
+    \cs{int_to_hex:n} \Arg{integer expression}
+  \end{syntax}
+  Calculates the value of the \meta{integer expression} and places
+  the hexadecimal (base~$16$) representation of the result in the
+  input stream. Letters are used for digits beyond~$9$: lower
+  case letters for \cs{int_to_hex:n} and upper case ones for
+  \cs{int_to_Hex:n}.
+  The resulting tokens are digits with category code $12$ (other) and
+  letters with category code $11$ (letter).
+\end{function}
+%
+\begin{function}[added = 2014-02-11, EXP]{\int_to_oct:n}
+  \begin{syntax}
+    \cs{int_to_oct:n} \Arg{integer expression}
+  \end{syntax}
+  Calculates the value of the \meta{integer expression} and places
+  the octal (base~$8$) representation of the result in the input
+  stream.
+  The resulting tokens are digits with category code $12$ (other) and
+  letters with category code $11$ (letter).
+\end{function}
+%
+\begin{function}[updated = 2014-02-11, EXP]
+  {\int_to_base:nn, \int_to_Base:nn}
+  \begin{syntax}
+    \cs{int_to_base:nn} \Arg{integer expression} \Arg{base}
+  \end{syntax}
+  Calculates the value of the \meta{integer expression} and
+  converts it into the appropriate representation in the \meta{base};
+  the later may be given as an integer expression. For bases greater
+  than $10$ the higher \enquote{digits} are represented by
+  letters from the English alphabet:  lower
+  case letters for \cs{int_to_base:n} and upper case ones for
+  \cs{int_to_Base:n}.
+  The maximum \meta{base} value is $36$.
+  The resulting tokens are digits with category code $12$ (other) and
+  letters with category code $11$ (letter).
+  \begin{texnote}
+    This is a generic version of \cs{int_to_bin:n}, \emph{etc.}
+  \end{texnote}
+\end{function}
+%
+\begin{function}[updated = 2011-10-22, rEXP]{\int_to_roman:n, \int_to_Roman:n}
+  \begin{syntax}
+    \cs{int_to_roman:n} \Arg{integer expression}
+  \end{syntax}
+  Places the value of the \meta{integer expression} in the input
+  stream as Roman numerals, either lower case (\cs{int_to_roman:n}) or
+  upper case (\cs{int_to_Roman:n}).  If the value is negative or zero,
+  the output is empty.  The Roman numerals are letters with category
+  code $11$ (letter).  The letters used are |mdclxvi|, repeated as
+  needed: the notation with bars (such as $\bar{\mbox{v}}$ for $5000$)
+  is \emph{not} used.  For instance \cs{int_to_roman:n} |{| 8249 |}|
+  expands to |mmmmmmmmccxlix|.
+\end{function}
+%
+\section{Converting from other formats to integers}
+%
+\begin{function}[updated = 2014-08-25, EXP]{\int_from_alph:n}
+  \begin{syntax}
+    \cs{int_from_alph:n} \Arg{letters}
+  \end{syntax}
+  Converts the \meta{letters} into the integer (base~$10$)
+  representation and leaves this in the input stream.  The
+  \meta{letters} are first converted to a string, with no expansion.
+  Lower and upper case letters from the English alphabet may be used,
+  with \enquote{a} equal to $1$ through to \enquote{z} equal to $26$.
+  The function also accepts a leading sign, made of |+| and~|-|.  This
+  is the inverse function of \cs{int_to_alph:n} and
+  \cs{int_to_Alph:n}.
+\end{function}
+%
+\begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
+  {\int_from_bin:n}
+  \begin{syntax}
+    \cs{int_from_bin:n} \Arg{binary number}
+  \end{syntax}
+  Converts the \meta{binary number} into the integer (base~$10$)
+  representation and leaves this in the input stream.
+  The \meta{binary number} is first converted to a string, with no
+  expansion.  The function accepts a leading sign, made of |+|
+  and~|-|, followed by binary digits.  This is the inverse function
+  of \cs{int_to_bin:n}.
+\end{function}
+%
+\begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
+  {\int_from_hex:n}
+  \begin{syntax}
+    \cs{int_from_hex:n} \Arg{hexadecimal number}
+  \end{syntax}
+  Converts the \meta{hexadecimal number} into the integer (base~$10$)
+  representation and leaves this in the input stream.  Digits greater
+  than $9$ may be represented in the \meta{hexadecimal number} by
+  upper or lower case letters.  The \meta{hexadecimal number} is first
+  converted to a string, with no expansion.  The function also accepts
+  a leading sign, made of |+| and~|-|.  This is the inverse function
+  of \cs{int_to_hex:n} and \cs{int_to_Hex:n}.
+\end{function}
+%
+\begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
+  {\int_from_oct:n}
+  \begin{syntax}
+    \cs{int_from_oct:n} \Arg{octal number}
+  \end{syntax}
+  Converts the \meta{octal number} into the integer (base~$10$)
+  representation and leaves this in the input stream.
+  The \meta{octal number} is first converted to a string, with no
+  expansion.  The function accepts a leading sign, made of |+|
+  and~|-|, followed by octal digits.  This is the inverse function
+  of \cs{int_to_oct:n}.
+\end{function}
+%
+\begin{function}[updated = 2014-08-25, updated = 2014-08-25, EXP]
+  {\int_from_roman:n}
+  \begin{syntax}
+    \cs{int_from_roman:n} \Arg{roman numeral}
+  \end{syntax}
+  Converts the \meta{roman numeral} into the integer (base~$10$)
+  representation and leaves this in the input stream.  The \meta{roman
+    numeral} is first converted to a string, with no expansion.  The
+  \meta{roman numeral} may be in upper or lower case; if the numeral
+  contains characters besides |mdclxvi| or |MDCLXVI| then the
+  resulting value is $-1$.  This is the inverse function of
+  \cs{int_to_roman:n} and \cs{int_to_Roman:n}.
+\end{function}
+%
+\begin{function}[updated = 2014-08-25, EXP]{\int_from_base:nn}
+  \begin{syntax}
+    \cs{int_from_base:nn} \Arg{number} \Arg{base}
+  \end{syntax}
+  Converts the \meta{number} expressed in \meta{base} into the
+  appropriate value in base $10$.  The \meta{number} is first
+  converted to a string, with no expansion.  The \meta{number} should
+  consist of digits and letters (either lower or upper case), plus
+  optionally a leading sign. The maximum \meta{base} value is $36$.
+  This is the inverse function of \cs{int_to_base:nn} and
+  \cs{int_to_Base:nn}.
+\end{function}
+%
+\section{Random integers}
+%
+\begin{function}[EXP, added = 2016-12-06, updated = 2018-04-27]{\int_rand:nn}
+  \begin{syntax}
+    \cs{int_rand:nn} \Arg{intexpr_1} \Arg{intexpr_2}
+  \end{syntax}
+  Evaluates the two \meta{integer expressions} and produces a
+  pseudo-random number between the two (with bounds included).
+  This is not available in older versions of \XeTeX{}.
+\end{function}
+%
+\begin{function}[EXP, added = 2018-05-05]{\int_rand:n}
+  \begin{syntax}
+    \cs{int_rand:n} \Arg{intexpr}
+  \end{syntax}
+  Evaluates the \meta{integer expression} then produces a
+  pseudo-random number between $1$ and the \meta{intexpr} (included).
+  This is not available in older versions of \XeTeX{}.
+\end{function}
+%
+\section{Viewing integers}
+%
+\begin{function}{\int_show:N, \int_show:c}
+  \begin{syntax}
+    \cs{int_show:N} \meta{integer}
+  \end{syntax}
+  Displays the value of the \meta{integer} on the terminal.
+\end{function}
+%
+\begin{function}[added = 2011-11-22, updated = 2015-08-07]{\int_show:n}
+  \begin{syntax}
+    \cs{int_show:n} \Arg{integer expression}
+  \end{syntax}
+  Displays the result of evaluating the \meta{integer expression}
+  on the terminal.
+\end{function}
+%
+\begin{function}[added = 2014-08-22, updated = 2015-08-03]{\int_log:N, \int_log:c}
+  \begin{syntax}
+    \cs{int_log:N} \meta{integer}
+  \end{syntax}
+  Writes the value of the \meta{integer} in the log file.
+\end{function}
+%
+\begin{function}[added = 2014-08-22, updated = 2015-08-07]{\int_log:n}
+  \begin{syntax}
+    \cs{int_log:n} \Arg{integer expression}
+  \end{syntax}
+  Writes the result of evaluating the \meta{integer expression}
+  in the log file.
+\end{function}
+%
+\section{Constant integers}
+%
+\begin{variable}[added = 2018-05-07]{\c_zero_int, \c_one_int}
+  Integer values used with primitive tests and assignments: their
+  self-terminating nature makes these more convenient and faster than
+  literal numbers.
+\end{variable}
+%
+\begin{variable}{\c_max_int}
+  The maximum value that can be stored as an integer.
+\end{variable}
+%
+\begin{variable}{\c_max_register_int}
+  Maximum number of registers.
+\end{variable}
+%
+\begin{variable}{\c_max_char_int}
+  Maximum character code completely supported by the engine.
+\end{variable}
+%
+\section{Scratch integers}
+%
+\begin{variable}{\l_tmpa_int, \l_tmpb_int}
+  Scratch integer for local assignment. These are never used by
+  the kernel code, and so are safe for use with any \LaTeX3-defined
+  function. However, they may be overwritten by other non-kernel
+  code and so should only be used for short-term storage.
+\end{variable}
+%
+\begin{variable}{\g_tmpa_int, \g_tmpb_int}
+  Scratch integer for global assignment. These are never used by
+  the kernel code, and so are safe for use with any \LaTeX3-defined
+  function. However, they may be overwritten by other non-kernel
+  code and so should only be used for short-term storage.
+\end{variable}
+%
+\subsection{Direct number expansion}
+%
+\begin{function}[EXP, added = 2018-03-27]{\int_value:w}
+  \begin{syntax}
+    \cs{int_value:w} \meta{integer}
+    \cs{int_value:w} \meta{integer denotation} \meta{optional space}
+  \end{syntax}
+  Expands the following tokens until an \meta{integer} is formed, and
+  leaves a normalized form (no leading sign except for negative
+  numbers, no leading digit~|0| except for zero) in the input stream
+  as category code $12$ (other) characters.  The \meta{integer} can
+  consist of any number of signs (with intervening spaces) followed
+  by
+  \begin{itemize}
+    \item an integer variable (in fact, any \TeX{} register except
+      \tn{toks}) or
+    \item explicit digits (or by |'|\meta{octal digits} or |"|\meta{hexadecimal digits} or |`|\meta{character}).
+  \end{itemize}
+  In this last case expansion stops once a non-digit is found; if that is a
+  space it is removed as in \texttt{f}-expansion, and so \cs{exp_stop_f:}
+  may be employed as an end marker. Note that protected functions
+  \emph{are} expanded by this process.
+%
+  This function requires exactly one expansion to produce a value, and so
+  is suitable for use in cases where a number is required \enquote{directly}.
+  In general, \cs{int_eval:n} is the preferred approach to generating
+  numbers.
+  \begin{texnote}
+    This is the \TeX{} primitive \tn{number}.
+  \end{texnote}
+\end{function}
+%
+\section{Primitive conditionals}
+%
+\begin{function}[EXP]{\if_int_compare:w}
+  \begin{syntax}
+    \cs{if_int_compare:w} \meta{integer_1} \meta{relation} \meta{integer_2}
+    ~~\meta{true code}
+    \cs{else:}
+    ~~\meta{false code}
+    \cs{fi:}
+  \end{syntax}
+  Compare two integers using \meta{relation}, which must be one of
+  |=|, |<| or |>| with category code $12$.
+  The \cs{else:} branch is optional.
+  \begin{texnote}
+    These are both names for the \TeX{} primitive \tn{ifnum}.
+  \end{texnote}
+\end{function}
+%
+\begin{function}[EXP]{\if_case:w, \or:}
+  \begin{syntax}
+    \cs{if_case:w} \meta{integer} \meta{case_0}
+    ~~\cs{or:} \meta{case_1}
+    ~~\cs{or:} |...|
+    ~~\cs{else:} \meta{default}
+    \cs{fi:}
+  \end{syntax}
+  Selects a case to execute based on the value of the \meta{integer}. The
+  first case (\meta{case_0}) is executed if \meta{integer} is $0$, the second
+  (\meta{case_1}) if the \meta{integer} is $1$, \emph{etc.} The
+  \meta{integer} may be a literal, a constant or an integer
+  expression (\emph{e.g.}~using \cs{int_eval:n}).
+  \begin{texnote}
+    These are the \TeX{} primitives \tn{ifcase} and \tn{or}.
+  \end{texnote}
+\end{function}
+%
+\begin{function}[EXP]{\if_int_odd:w}
+  \begin{syntax}
+    \cs{if_int_odd:w} \meta{tokens}  \meta{optional space}
+    ~~\meta{true code}
+    \cs{else:}
+    ~~\meta{true code}
+    \cs{fi:}
+  \end{syntax}
+  Expands \meta{tokens} until a non-numeric token or a space is found, and
+  tests whether the resulting \meta{integer} is odd. If so, \meta{true code}
+  is executed. The \cs{else:} branch is optional.
+  \begin{texnote}
+    This is the \TeX{} primitive \tn{ifodd}.
+  \end{texnote}
+\end{function}
+%
+\end{documentation}
+%
+\PrintIndex
+%
+\end{document}
