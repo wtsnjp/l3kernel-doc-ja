@@ -11,7 +11,7 @@
 %% Note: このファイルは日本語文字を含みます.
 
 %% 依存パッケージ
-\RequirePackage{expl3,xparse,tcolorbox}
+\RequirePackage{expl3,xparse,bxghost,tcolorbox}
 \tcbuselibrary{skins,breakable,xparse}
 
 %% クラス宣言
@@ -32,16 +32,18 @@
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
 %% 専用マクロ
-\NewExpandableDocumentCommand \eghost { } { \eghostguarded { } }
+\NewExpandableDocumentCommand { \eghost } {} { \eghostguarded { } }
+\DeclareDocumentCommand { \code } { m }
+  { \eghostguarded { \texttt {#1} } }
 
 %% マクロの上書き
-\DeclareDocumentCommand \cmd { O{} m }
+\DeclareDocumentCommand { \cmd } { O{} m }
   { \eghostguarded { \__codedoc_cmd:no {#1} { \token_to_str:N #2 } } }
-\DeclareDocumentCommand \cs  { O{} m }
+\DeclareDocumentCommand { \cs } { O{} m }
   { \eghostguarded { \__codedoc_cmd:no {#1} { \c_backslash_str #2 } } }
 
 %% 枠
-\DeclareTColorBox { texnote } { }
+\DeclareTColorBox { texnote } {}
   {
     empty, left=2mm, right=2mm, top=-1mm,
     attach~boxed~title~to~top~left={xshift=1.2zw},
@@ -50,23 +52,23 @@
     },
     colframe=black, coltitle=black, coltext=black, breakable,  
     underlay~unbroken={
-      \draw [black,line~width=.5pt]
+      \draw [black, line~width=.5pt]
         (title.east) -- (title.east-|frame.east) -- (frame.south~east)
           -- (frame.south~west) -- (title.west-|frame.west) -- (title.west);
     },
     underlay~first={
-      \draw [black,line~width=.5pt](title.east) -- (title.east-|frame.east)
+      \draw [black, line~width=.5pt] (title.east) -- (title.east-|frame.east)
         -- (frame.south~east);
-      \draw [black,line~width=.5pt] (frame.south~west)
+      \draw [black, line~width=.5pt] (frame.south~west)
         -- (title.west-|frame.west) -- (title.west);
     },
     underlay~middle={
-      \draw [black,line~width=.5pt]
+      \draw [black, line~width=.5pt]
         (frame.north~east) -- (frame.south~east) ;
-      \draw [black,line~width=.5pt](frame.south~west) -- (frame.north~west) ;
+      \draw [black, line~width=.5pt] (frame.south~west) -- (frame.north~west) ;
     },
     underlay~last={
-      \draw [black,line~width=.5pt](frame.north~east) -- (frame.south~east)
+      \draw [black, line~width=.5pt] (frame.north~east) -- (frame.south~east)
         -- (frame.south~west) -- (frame.north~west) ;
     },
     fonttitle=\sffamily\gtfamily,

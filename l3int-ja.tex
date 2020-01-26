@@ -8,9 +8,6 @@
 % +++
 \documentclass[dvipdfmx,full,kernel]{wtpl3doc}
 
-\usepackage{bxghost}
-\newcommand{\code}[1]{\eghostguarded{\texttt{#1}}}
-
 \begin{document}
 \title{\pkg{l3int}パッケージ \\ 整数}
 %
@@ -74,8 +71,8 @@
 %  \item \texttt{/} denotes division rounded to the closest integer with
 %    ties rounded away from zero;
 %
-  \item \code{/}は除算を行いますが，その結果は0から離れる方向で最も近い
-    整数に丸められます．
+  \item \code{/}は除算を行いますが，その結果は最も近い整数に丸められます．
+    ただし，差が等しい整数が2つある場合は0から遠い方に丸められます．
 %
 %  \item there is an error and the overall expression evaluates to zero
 %    whenever the absolute value of any intermediate result exceeds
@@ -163,56 +160,84 @@
   \begin{syntax}
     \cs{int_eval:w} \meta{integer expression}
   \end{syntax}
-  Evaluates the \meta{integer expression} as described for
-  \cs{int_eval:n}. The end of the expression is the first token
-  encountered that cannot form part of such an expression.  If that
-  token is \cs{scan_stop:} it is removed, otherwise not.  Spaces do
-  \emph{not} terminate the expression.  However, spaces terminate
-  explict integers, and this may terminate the expression: for
-  instance, \cs{int_eval:w} \verb*|1 + 1 9| expands to \texttt{29}
-  since the digit~\texttt{9} is not part of the expression.
+%  Evaluates the \meta{integer expression} as described for
+%  \cs{int_eval:n}. The end of the expression is the first token
+%  encountered that cannot form part of such an expression.  If that
+%  token is \cs{scan_stop:} it is removed, otherwise not.  Spaces do
+%  \emph{not} terminate the expression.  However, spaces terminate
+%  explict integers, and this may terminate the expression: for
+%  instance, \cs{int_eval:w} \verb*|1 + 1 9| expands to \texttt{29}
+%  since the digit~\texttt{9} is not part of the expression.
+%
+  整数表現\meta{integer expression}を\cs{int_eval:n}と同様に評価します．
+  展開は整数表現に含まれ得ない最初のトークンを見つけた際に終了します．
+  もしそのトークンが\cs{scan_stop:}だった場合は除去されますが，それ以外
+  の場合はそのままになります．空白文字は展開を停止させ\emph{ない}ことに
+  注意してください．ただしスペースは明示的な整数リテラルの終端を表す
+  ことができるので，この性質を以て整数表現の終了点を表現することは可能
+  です．例えば，\code{\cs{int_eval:w} 1 + 1 9}は\code{9}が整数表現の一部
+  たり得ないことから\code{29}に展開されます．
 \end{function}
 %
 \begin{function}[EXP, added = 2018-11-03]{\int_sign:n}
   \begin{syntax}
     \cs{int_sign:n} \Arg{intexpr}
   \end{syntax}
-  Evaluates the \meta{integer expression} then leaves $1$ or $0$ or
-  $-1$ in the input stream according to the sign of the result.
+%  Evaluates the \meta{integer expression} then leaves $1$ or $0$ or
+%  $-1$ in the input stream according to the sign of the result.
+%
+  整数表現\meta{integer expression}を評価し，その結果の符号に応じて入力
+  ストリームに\code{1}, \code{0}, \code{-1}のいずれかを残します．
 \end{function}
 %
 \begin{function}[EXP, updated = 2012-09-26]{\int_abs:n}
   \begin{syntax}
     \cs{int_abs:n} \Arg{integer expression}
   \end{syntax}
-  Evaluates the \meta{integer expression} as described for
-  \cs{int_eval:n} and leaves the absolute value of the result in
-  the input stream as an \meta{integer denotation} after two
-  expansions.
+%  Evaluates the \meta{integer expression} as described for
+%  \cs{int_eval:n} and leaves the absolute value of the result in
+%  the input stream as an \meta{integer denotation} after two
+%  expansions.
+%
+  整数表現\meta{integer expression}を\cs{int_eval:n}と同様に評価し，
+  その結果の絶対値を2回展開の後に明示的な整数リテラルとして入力
+  ストリームに残します．
 \end{function}
 %
 \begin{function}[EXP, updated = 2012-09-26]{\int_div_round:nn}
   \begin{syntax}
     \cs{int_div_round:nn} \Arg{intexpr_1} \Arg{intexpr_2}
   \end{syntax}
-  Evaluates the two \meta{integer expressions} as described earlier,
-  then divides the first value by the second, and rounds the result
-  to the closest integer.  Ties are rounded away from zero.
-  Note that this is identical to using
-  |/| directly in an \meta{integer expression}. The result is left in
-  the input stream as an \meta{integer denotation} after two expansions.
+%  Evaluates the two \meta{integer expressions} as described earlier,
+%  then divides the first value by the second, and rounds the result
+%  to the closest integer.  Ties are rounded away from zero.
+%  Note that this is identical to using
+%  |/| directly in an \meta{integer expression}. The result is left in
+%  the input stream as an \meta{integer denotation} after two expansions.
+%
+  2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
+  値で割ります．除算の結果は最も近い整数値に丸められます．ただし，差が
+  等しい整数が2つある場合は0から遠い方に丸められます．これは整数表現の
+  中で\code{/}を直接用いる場合と同じ挙動です．演算結果は2回展開の後に
+  入力ストリームに明示的な整数リテラルとして残ります．
 \end{function}
 %
 \begin{function}[EXP, updated = 2012-02-09]{\int_div_truncate:nn}
   \begin{syntax}
     \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2}
   \end{syntax}
-  Evaluates the two \meta{integer expressions} as described earlier,
-  then divides the first value by the second, and rounds the result
-  towards zero.  Note that division using |/|
-  rounds to the closest integer instead.
-  The result is left in the input stream as an
-  \meta{integer denotation} after two expansions.
+%  Evaluates the two \meta{integer expressions} as described earlier,
+%  then divides the first value by the second, and rounds the result
+%  towards zero.  Note that division using |/|
+%  rounds to the closest integer instead.
+%  The result is left in the input stream as an
+%  \meta{integer denotation} after two expansions.
+%
+  2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
+  値で割ります．除算の結果は0に近づく方向で最も近い整数値に丸められ
+  ます．整数表現の中で\code{/}を直接用いると最も近い整数に丸められる
+  ことに注意してください．演算結果は2回展開の後に入力ストリームに明示
+  的な整数リテラルとして残ります．
 \end{function}
 %
 \begin{function}[EXP, updated = 2012-09-26]{\int_max:nn, \int_min:nn}
@@ -220,24 +245,35 @@
     \cs{int_max:nn} \Arg{intexpr_1} \Arg{intexpr_2}
     \cs{int_min:nn} \Arg{intexpr_1} \Arg{intexpr_2}
   \end{syntax}
-  Evaluates the \meta{integer expressions} as described for
-  \cs{int_eval:n} and leaves either the larger or smaller value
-  in the input stream as an \meta{integer denotation} after two
-  expansions.
+%  Evaluates the \meta{integer expressions} as described for
+%  \cs{int_eval:n} and leaves either the larger or smaller value
+%  in the input stream as an \meta{integer denotation} after two
+%  expansions.
+%
+  各整数表現を\cs{int_eval:n}と同様に評価し，2回展開の後それぞれその
+  結果のうち小さくない方と大きくない方を入力ストリームに残します．
 \end{function}
 %
 \begin{function}[EXP, updated = 2012-09-26]{\int_mod:nn}
   \begin{syntax}
     \cs{int_mod:nn} \Arg{intexpr_1} \Arg{intexpr_2}
   \end{syntax}
-  Evaluates the two \meta{integer expressions} as described earlier,
-  then calculates the integer remainder of dividing the first
-  expression by the second.  This is obtained by subtracting
-  \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2} times
-  \meta{intexpr_2} from \meta{intexpr_1}.  Thus, the result has the
-  same sign as \meta{intexpr_1} and its absolute value is strictly
-  less than that of \meta{intexpr_2}.  The result is left in the input
-  stream as an \meta{integer denotation} after two expansions.
+%  Evaluates the two \meta{integer expressions} as described earlier,
+%  then calculates the integer remainder of dividing the first
+%  expression by the second.  This is obtained by subtracting
+%  \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2} times
+%  \meta{intexpr_2} from \meta{intexpr_1}.  Thus, the result has the
+%  same sign as \meta{intexpr_1} and its absolute value is strictly
+%  less than that of \meta{intexpr_2}.  The result is left in the input
+%  stream as an \meta{integer denotation} after two expansions.
+%
+  2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
+  値で割った際の余りを計算します．これは\code{\cs{int_div_truncate:nn}
+  \Arg{intexpr_1} \Arg{intexpr_2}}から\meta{intexpr_1}と
+  \meta{intexpr_2}の積を引くことにより実現されています．したがって，
+  演算結果は\meta{intexpr_1}と同じ符号をもち，その絶対値は必ず
+  \meta{intexpr_2}より小さくなります．演算結果は2回展開の後に入力スト
+  リームに明示的な整数リテラルとして残ります．
 \end{function}
 %
 \section{Creating and initialising integers}
