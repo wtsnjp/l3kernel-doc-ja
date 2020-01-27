@@ -1,5 +1,5 @@
 %%
-%% This is file `wtjal3doc.cls'.
+%% This is file `wtpl3doc.cls'.
 %%
 %% Copyright 2020 Takuto ASAKURA (wtsnjp)
 %%   GitHub:   https://github.com/wtsnjp
@@ -27,20 +27,19 @@
 \ProcessOptions \scan_stop:
 \LoadClass { l3doc }
 
-%% 日本語設定
+%% 日本語用設定
 \setlength \parindent { 1zh }
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
 %% 専用マクロ
-\NewExpandableDocumentCommand { \eghost } {} { \eghostguarded { } }
+\NewExpandableDocumentCommand { \eghost } {} { \eghostguarded {} }
 \DeclareDocumentCommand { \code } { m }
   { \eghostguarded { \texttt {#1} } }
 
 %% マクロの上書き
-\DeclareDocumentCommand { \cmd } { O{} m }
-  { \eghostguarded { \__codedoc_cmd:no {#1} { \token_to_str:N #2 } } }
-\DeclareDocumentCommand { \cs } { O{} m }
-  { \eghostguarded { \__codedoc_cmd:no {#1} { \c_backslash_str #2 } } }
+\cs_new_eq:NN \__wtpl_codedoc_cmd:nn \__codedoc_cmd:nn
+\cs_set_protected:Npn \__codedoc_cmd:nn #1#2
+  { \eghostguarded { \__wtpl_codedoc_cmd:nn {#1} {#2} } }
 
 %% 枠
 \DeclareTColorBox { texnote } {}
