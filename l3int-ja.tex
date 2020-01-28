@@ -1,6 +1,6 @@
 % +++
 % sequence = ["latex", "dvipdf"]
-% latex = "platex"
+% latex = "uplatex"
 % clean_files = [
 %   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
 %   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
@@ -33,7 +33,6 @@
 %parentheses can be used within such expressions to carry
 %arithmetic operations. This module carries out these functions
 %on \emph{integer expressions} (\enquote{\texttt{intexpr}}).
-%
 整数値の計算や比較は数値リテラル，\code{int}レジスタ，定数，トークン
 リストに格納された整数によって実現することができます．標準的な演算子
 \code{+}, \code{-}, \code{/}, \code{*}およびカッコはそうした表現の
@@ -42,7 +41,6 @@
 提供します．
 %
 %\section{Integer expressions}
-%
 \section{整数表現}
 %
 \begin{function}[EXP]{\int_eval:n}
@@ -58,7 +56,6 @@
 %  \texttt{(}, \texttt{)} and of course integer operands.  The result
 %  is calculated by applying standard mathematical rules with the
 %  following peculiarities:
-%
   整数表現\meta{integer expression}を評価し，その結果を入力ストリームに
   明示的な整数値として残します．正の結果の場合は明示的な10進数，負の結果
   の場合は\code{-}に続く明示的な10進数，そして結果が0の場合は\code{0}が
@@ -70,7 +67,6 @@
   \begin{itemize}
 %  \item \texttt{/} denotes division rounded to the closest integer with
 %    ties rounded away from zero;
-%
   \item \code{/}は除算を行いますが，その結果は最も近い整数に丸められます．
     ただし，差が等しい整数が2つある場合は0から遠い方に丸められます．
 %
@@ -79,7 +75,6 @@
 %    $2^{31}-1$, except in the case of scaling operations
 %    $a$\texttt{*}$b$\texttt{/}$c$, for which $a$\texttt{*}$b$ may be
 %    arbitrarily large;
-%
   \item 演算には誤差があります．また計算の途中で$2^{31}-1$を超える結果が
     生じた場合，最終的な計算結果は0と評価されます．ただし$a$\code{*}$b$%
     \code{/}$c$のようなスケーリング操作については$a$\code{*}$b$の部分は
@@ -89,7 +84,6 @@
 %    \texttt{-}, namely placing \texttt{+(} or \texttt{-(} at the start
 %    of an expression or after \texttt{+}, \texttt{-}, \texttt{*},
 %    \texttt{/} or~\texttt{(} leads to an error.
-%
   \item カッコを単項演算子\code{+}, \code{-}の直後に置くことはできません．
     すなわち表現の冒頭や\code{+}, \code{-}, \code{*}, \code{/}, \code{(}%
     の直後に\code{+(}や\code{-(}を記述するとエラーが発生します．
@@ -97,7 +91,6 @@
 %
 %  Each integer operand can be either an integer variable (with no need
 %  for \cs{int_use:N}) or an integer denotation.  For example both
-%
   整数オペランドは整数変数（\cs{int_use:N}は必要ありません）または整数
   リテラルのいずれかです．例えば
 %
@@ -106,7 +99,6 @@
   \end{verbatim}
 %
 %  and
-%
   および
 %
   \begin{verbatim}
@@ -123,7 +115,6 @@
 %  restricted-expandable functions can both be used, and \cs{exp_not:n}
 %  and its variants have no effect while \cs{exp_not:N} may incorrectly
 %  interrupt the expression.
-%
   はいずれも$-6$と評価されます．なぜなら\cs[no-index]{l_my_tl}は整数リテ
   ラル\code{5}に展開されるためです．評価の際，整数表現\meta{integer
   expression}は左から右に向かって完全展開されるため，整数表現の中では
@@ -136,7 +127,6 @@
 %    The result is \emph{not} an \meta{internal integer}, and therefore
 %    requires suitable termination if used in a \TeX{}-style integer
 %    assignment.
-%
     \cs{int_eval:n}の評価にはちょうど2回の展開が必要です．評価結果は
     \meta{internal integer}では\emph{ない}ため\TeX 言語スタイルの代入を
     行う場合には適当な終了点明示が必要となります．
@@ -148,7 +138,6 @@
 %    |"| followed by digits or upper case letters from
 %    \texttt{A} to~\texttt{F}, or the character code of some character
 %    or one-character control sequence, given as \texttt{`}\meta{char}.
-%
     \TeX における他のすべての整数と同様，整数オペランドは寸法やスキップ
     の変数（これらは\code{sp}単位の整数値に変換されます），\code{'}に
     続く8進数，|"|\eghost に続く16進数，あるいは\code{`}\meta{char}の
@@ -168,7 +157,6 @@
 %  explict integers, and this may terminate the expression: for
 %  instance, \cs{int_eval:w} \verb*|1 + 1 9| expands to \texttt{29}
 %  since the digit~\texttt{9} is not part of the expression.
-%
   整数表現\meta{integer expression}を\cs{int_eval:n}と同様に評価します．
   展開は整数表現に含まれ得ない最初のトークンを見つけた際に終了します．
   もしそのトークンが\cs{scan_stop:}だった場合は除去されますが，それ以外
@@ -185,7 +173,6 @@
   \end{syntax}
 %  Evaluates the \meta{integer expression} then leaves $1$ or $0$ or
 %  $-1$ in the input stream according to the sign of the result.
-%
   整数表現\meta{integer expression}を評価し，その結果の符号に応じて入力
   ストリームに\code{1}, \code{0}, \code{-1}のいずれかを残します．
 \end{function}
@@ -198,7 +185,6 @@
 %  \cs{int_eval:n} and leaves the absolute value of the result in
 %  the input stream as an \meta{integer denotation} after two
 %  expansions.
-%
   整数表現\meta{integer expression}を\cs{int_eval:n}と同様に評価し，
   その結果の絶対値を2回展開の後に明示的な整数リテラルとして入力
   ストリームに残します．
@@ -214,7 +200,6 @@
 %  Note that this is identical to using
 %  |/| directly in an \meta{integer expression}. The result is left in
 %  the input stream as an \meta{integer denotation} after two expansions.
-%
   2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
   値で割ります．除算の結果は最も近い整数値に丸められます．ただし，差が
   等しい整数が2つある場合は0から遠い方に丸められます．これは整数表現の
@@ -232,7 +217,6 @@
 %  rounds to the closest integer instead.
 %  The result is left in the input stream as an
 %  \meta{integer denotation} after two expansions.
-%
   2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
   値で割ります．除算の結果は0に近づく方向で最も近い整数値に丸められ
   ます．整数表現の中で\code{/}を直接用いると最も近い整数に丸められる
@@ -249,7 +233,6 @@
 %  \cs{int_eval:n} and leaves either the larger or smaller value
 %  in the input stream as an \meta{integer denotation} after two
 %  expansions.
-%
   各整数表現を\cs{int_eval:n}と同様に評価し，2回展開の後それぞれその
   結果のうち小さくない方と大きくない方を入力ストリームに残します．
 \end{function}
@@ -266,7 +249,6 @@
 %  same sign as \meta{intexpr_1} and its absolute value is strictly
 %  less than that of \meta{intexpr_2}.  The result is left in the input
 %  stream as an \meta{integer denotation} after two expansions.
-%
   2つの整数表現をそれぞれ前述の方法で評価し，その後1つ目の値を2つ目の
   値で割った際の余りを計算します．これは\code{\cs{int_div_truncate:nn}
   \Arg{intexpr_1} \Arg{intexpr_2}}から\meta{intexpr_1}と
@@ -276,31 +258,39 @@
   リームに明示的な整数リテラルとして残ります．
 \end{function}
 %
-\section{Creating and initialising integers}
+%\section{Creating and initialising integers}
+\section{整数の作成と初期化}
 %
 \begin{function}{\int_new:N, \int_new:c}
   \begin{syntax}
     \cs{int_new:N} \meta{integer}
   \end{syntax}
-  Creates a new \meta{integer} or raises an error if the name is
-  already taken. The declaration is global. The \meta{integer} is
-  initially equal to $0$.
+%  Creates a new \meta{integer} or raises an error if the name is
+%  already taken. The declaration is global. The \meta{integer} is
+%  initially equal to $0$.
+  整数\meta{integer}を作成します．与えられたトークンが既に存在する場合
+  はエラーが発生します．この宣言はグローバルです．\meta{integer}は$0$に
+  初期化されます．
 \end{function}
 %
 \begin{function}[updated = 2011-10-22]{\int_const:Nn, \int_const:cn}
   \begin{syntax}
     \cs{int_const:Nn} \meta{integer} \Arg{integer expression}
   \end{syntax}
-  Creates a new constant \meta{integer} or raises an error if the name
-  is already taken. The value of the \meta{integer} is set
-  globally to the \meta{integer expression}.
+%  Creates a new constant \meta{integer} or raises an error if the name
+%  is already taken. The value of the \meta{integer} is set
+%  globally to the \meta{integer expression}.
+  定数\meta{integer}を作成します．与えられたトークンが既に存在する場合
+  はエラーが発生します．その値はグローバルに\meta{integer expression}に
+  設定されます．
 \end{function}
 %
 \begin{function}{\int_zero:N, \int_zero:c, \int_gzero:N, \int_gzero:c}
   \begin{syntax}
     \cs{int_zero:N} \meta{integer}
   \end{syntax}
-  Sets \meta{integer} to $0$.
+%  Sets \meta{integer} to $0$.
+  \meta{integer}の値を$0$に設定します．
 \end{function}
 %
 \begin{function}[added = 2011-12-13]
@@ -308,10 +298,13 @@
   \begin{syntax}
     \cs{int_zero_new:N} \meta{integer}
   \end{syntax}
-  Ensures that the \meta{integer} exists globally by applying
-  \cs{int_new:N} if necessary, then applies
-  \cs[index=int_zero:N]{int_(g)zero:N} to leave
-  the \meta{integer} set to zero.
+%  Ensures that the \meta{integer} exists globally by applying
+%  \cs{int_new:N} if necessary, then applies
+%  \cs[index=int_zero:N]{int_(g)zero:N} to leave
+%  the \meta{integer} set to zero.
+  必要に応じて\cs{int_new:N}を実行することにより確実に\meta{integer}の
+  存在を確実にし，その後\cs[index=int_zero:N]{int_(g)zero:N}を適用して
+  \meta{integer}の値を$0$にします．
 \end{function}
 %
 \begin{function}
@@ -322,8 +315,9 @@
   \begin{syntax}
     \cs{int_set_eq:NN} \meta{integer_1} \meta{integer_2}
   \end{syntax}
-  Sets the content of \meta{integer_1} equal to that of
-  \meta{integer_2}.
+%  Sets the content of \meta{integer_1} equal to that of
+%  \meta{integer_2}.
+  \meta{integer_1}の値を\meta{integer_2}と等しい値に設定します．
 \end{function}
 %
 \begin{function}[EXP, pTF, added=2012-03-03]
@@ -332,33 +326,40 @@
     \cs{int_if_exist_p:N} \meta{int}
     \cs{int_if_exist:NTF} \meta{int} \Arg{true code} \Arg{false code}
   \end{syntax}
-  Tests whether the \meta{int} is currently defined.  This does not
-  check that the \meta{int} really is an integer variable.
+%  Tests whether the \meta{int} is currently defined.  This does not
+%  check that the \meta{int} really is an integer variable.
+  \meta{int}が現在定義済みかどうかをテストします．この関数は
+  \meta{int}が本当に整数変数かどうかは確かめません．
 \end{function}
 %
-\section{Setting and incrementing integers}
+%\section{Setting and incrementing integers}
+\section{整数の設定とインクリメント}
 %
 \begin{function}[updated = 2011-10-22]
   {\int_add:Nn, \int_add:cn, \int_gadd:Nn, \int_gadd:cn}
   \begin{syntax}
     \cs{int_add:Nn} \meta{integer} \Arg{integer expression}
   \end{syntax}
-  Adds the result of the \meta{integer expression} to the current
-  content of the \meta{integer}.
+%  Adds the result of the \meta{integer expression} to the current
+%  content of the \meta{integer}.
+  \meta{integer}の現在の値に\meta{integer expression}の評価結果を
+  加えます．
 \end{function}
 %
 \begin{function}{\int_decr:N, \int_decr:c, \int_gdecr:N, \int_gdecr:c}
   \begin{syntax}
     \cs{int_decr:N} \meta{integer}
   \end{syntax}
-  Decreases the value stored in \meta{integer} by $1$.
+%  Decreases the value stored in \meta{integer} by $1$.
+  \meta{integer}の値を$1$減じます．
 \end{function}
 %
 \begin{function}{\int_incr:N, \int_incr:c, \int_gincr:N, \int_gincr:c}
   \begin{syntax}
     \cs{int_incr:N} \meta{integer}
   \end{syntax}
-  Increases the value stored in \meta{integer} by $1$.
+%  Increases the value stored in \meta{integer} by $1$.
+  \meta{integer}の値を$1$増やします．
 \end{function}
 %
 \begin{function}[updated = 2011-10-22]
@@ -366,9 +367,12 @@
   \begin{syntax}
     \cs{int_set:Nn} \meta{integer} \Arg{integer expression}
   \end{syntax}
-  Sets \meta{integer} to the value of \meta{integer expression},
-  which must evaluate to an integer (as described for
-  \cs{int_eval:n}).
+%  Sets \meta{integer} to the value of \meta{integer expression},
+%  which must evaluate to an integer (as described for
+%  \cs{int_eval:n}).
+  \meta{integer}の値を\meta{integer expression}に設定します．
+  \meta{integer expression}の評価結果は必ず整数になる必要があります
+  （\cs{int_eval:n}と同様です）．
 \end{function}
 %
 \begin{function}[updated = 2011-10-22]
@@ -376,24 +380,33 @@
   \begin{syntax}
     \cs{int_sub:Nn} \meta{integer} \Arg{integer expression}
   \end{syntax}
-  Subtracts the result of the \meta{integer expression} from the
-  current content of the \meta{integer}.
+%  Subtracts the result of the \meta{integer expression} from the
+%  current content of the \meta{integer}.
+  \meta{integer}の現在の値から\meta{integer expression}の評価結果を
+  減じます．
 \end{function}
 %
-\section{Using integers}
+%\section{Using integers}
+\section{整数の使用}
 %
 \begin{function}[updated = 2011-10-22, EXP]{\int_use:N, \int_use:c}
   \begin{syntax}
     \cs{int_use:N} \meta{integer}
   \end{syntax}
-  Recovers the content of an \meta{integer} and places it directly
-  in the input stream. An error is raised if the variable does
-  not exist or if it is invalid. Can be omitted in places where an
-  \meta{integer} is required (such as in the first and third arguments
-  of \cs{int_compare:nNnTF}).
+%  Recovers the content of an \meta{integer} and places it directly
+%  in the input stream. An error is raised if the variable does
+%  not exist or if it is invalid. Can be omitted in places where an
+%  \meta{integer} is required (such as in the first and third arguments
+%  of \cs{int_compare:nNnTF}).
+  \meta{integer}の値を取り出して直接入力ストリームに置きます．変数
+  \meta{integer}が存在しない場合や不正な場合はエラーが発生します．
+  \meta{integer}が要求されている場所では省略できます（例えば
+  \cs{int_compare:nNnTF}関数の第1, 3引数）．
   \begin{texnote}
-    \cs{int_use:N} is the \TeX{} primitive \tn{the}: this is one of
-    several \LaTeX3 names for this primitive.
+%    \cs{int_use:N} is the \TeX{} primitive \tn{the}: this is one of
+%    several \LaTeX3 names for this primitive.
+    \cs{int_use:N}は\TeX プリミティブの\tn{the}に相当します．\tn{the}%
+    の\LaTeX3における名称が複数ありますが，そのうちの1つです．
   \end{texnote}
 \end{function}
 %
