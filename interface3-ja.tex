@@ -1,0 +1,131 @@
+% +++
+% sequence = ["latex", "dvipdf"]
+% latex = "uplatex"
+% clean_files = [
+%   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
+%   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
+% ]
+% +++
+\documentclass[dvipdfmx,kernel]{wtpl3doc}
+\usepackage{docmute}
+%\listfiles
+
+\begin{document}
+
+\title{The \LaTeX3 Interfaces}
+\author{%
+ The \LaTeX3 Project\thanks
+   {%
+     E-mail:
+       \href{mailto:latex-team@latex-project.org}
+         {latex-team@latex-project.org}%
+   }%
+}
+\date{Released 2020-01-22}
+
+\pagenumbering{roman}
+\maketitle
+
+\begin{abstract}
+
+\setlength\parindent{0pt}
+\setlength\parskip{\baselineskip}
+
+\noindent
+This is the reference documentation for the \pkg{expl3}
+programming environment. The \pkg{expl3} modules set up an experimental
+naming scheme for \LaTeX{} commands, which allow the \LaTeX{} programmer
+to systematically name functions and variables, and specify the argument
+types of functions.
+
+The \TeX{} and \eTeX{} primitives are all given a new name according to
+these conventions. However, in the main direct use of the primitives is
+not required or encouraged: the \pkg{expl3} modules define an
+independent low-level \LaTeX3 programming language.
+
+At present, the \pkg{expl3} modules are designed to be loaded on top of
+\LaTeXe{}. In time, a \LaTeX3 format will be produced based on this code.
+This allows the code to be used in \LaTeXe{} packages \emph{now} while a
+stand-alone \LaTeX3 is developed.
+
+\begin{bfseries}
+  While \pkg{expl3} is still experimental, the bundle is now regarded as
+  broadly stable. The syntax conventions and functions provided are now
+  ready for wider use. There may still be changes to some functions, but
+  these will be minor when compared to the scope of \pkg{expl3}.
+
+  New modules will be added to the distributed version of \pkg{expl3} as
+  they reach maturity.
+\end{bfseries}
+
+\end{abstract}
+
+\clearpage
+
+{%
+  \def\\{:}% fix "newlines" in the ToC
+  \tableofcontents
+}
+
+\clearpage
+\pagenumbering{arabic}
+
+\makeatletter
+\def\partname{Part}
+\def\maketitle{\clearpage\part{\@title}}
+\let\thanks\@gobble
+\let\DelayPrintIndex\PrintIndex
+\let\PrintIndex\@empty
+\providecommand*{\hexnum}[1]{\text{\texttt{\char`\"}#1}}
+\makeatother
+
+\input{introduction-ja.tex}
+
+%\DocInput{l3bootstrap.dtx}
+%\DocInput{l3names.dtx}
+%\DocInput{l3basics.dtx}
+%\DocInput{l3expan.dtx}
+%\DocInput{l3tl.dtx}
+%\DocInput{l3str.dtx}
+%\DocInput{l3str-convert.dtx}
+%\DocInput{l3quark.dtx}
+%\DocInput{l3seq.dtx}
+%\DocInput{l3int.dtx}
+\input{l3int-ja.tex}
+%\DocInput{l3flag.dtx}
+%\DocInput{l3prg.dtx}
+%\DocInput{l3sys.dtx}
+%\DocInput{l3clist.dtx}
+%\DocInput{l3token.dtx}
+%\DocInput{l3prop.dtx}
+%\DocInput{l3msg.dtx}
+%\DocInput{l3file.dtx}
+%\DocInput{l3skip.dtx}
+%\DocInput{l3keys.dtx}
+%\DocInput{l3intarray.dtx}
+%\DocInput{l3fp.dtx}
+%\DocInput{l3fparray.dtx}
+%\DocInput{l3sort.dtx}
+%\DocInput{l3tl-analysis.dtx}
+%\DocInput{l3regex.dtx}
+%\DocInput{l3box.dtx}
+%\DocInput{l3coffins.dtx}
+%\DocInput{l3color-base.dtx}
+%\DocInput{l3luatex.dtx}
+%\DocInput{l3unicode.dtx}
+%\DocInput{l3text.dtx}
+%\DocInput{l3legacy.dtx}
+%\DocInput{l3candidates.dtx}
+
+% 終了部
+\clearpage
+
+\begingroup
+  \def\endash{--}
+  \catcode`\-\active
+  \def-{\futurelet\temp\indexdash}
+  \def\indexdash{\ifx\temp-\endash\fi}
+  \DelayPrintIndex
+\endgroup
+
+\end{document}
