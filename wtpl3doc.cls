@@ -19,16 +19,56 @@
 \ProvidesExplPackage {wtpl3doc} {2020/01/26} {0.1.0}
   {L3 Experimental documentation class for pLaTeX}
 
-%% l3doc を読み込む
+%% クラスオプション
+% 既知の l3doc オプションは l3doc に渡す
+\clist_const:Nn \c__wtpl_codedoc_options_clist
+  {
+    a5paper, full, onlydoc, check, nocheck, checktest, nochecktest,
+    kernel, stdmodule, cm-default, lm-default, cs-break-off,
+    cs-break-nohyphen, show-notes, hide-notes,
+  }
+\clist_map_inline:Nn \c__wtpl_codedoc_options_clist
+  {
+    \DeclareOption {#1} {
+      \PassOptionsToClass { \CurrentOption } { l3doc }
+    }
+  }
+
+% それ以外は jsarticle に渡す
 \DeclareOption*
   {
-    \PassOptionsToClass { \CurrentOption } { l3doc }
+    \PassOptionsToClass { \CurrentOption } { jsarticle }
   }
+\PassOptionsToClass { a4paper } { jsarticle }
+\PassOptionsToClass { nomag } { jsarticle }
 \ProcessOptions \scan_stop:
-\LoadClass { l3doc }
+
+%% l3doc を読み込む
+% l3doc は内部で article を呼ぶので，代わりに jsarticle を呼ぶように細工
+\cs_new_eq:NN \__wtpl_original_load_class:n \LoadClass
+\cs_new_eq:NN \__wtpl_original_pass_options_to_class:nn \PassOptionsToClass
+\cs_new:Npn \__wtpl_load_class:n #1
+  {
+    \tl_if_eq:nnTF {#1} { article }
+      { \__wtpl_original_load_class:n { jsarticle } }
+      { \__wtpl_original_load_class:n {#1} }
+  }
+\cs_new:Npn \__wtpl_pass_options_to_class:nn #1#2
+  {
+    \tl_if_eq:nnTF {#2} { article }
+      { \__wtpl_original_pass_options_to_class:nn {#1} { jsarticle } }
+      { \__wtpl_original_pass_options_to_class:nn {#1} {#2} }
+  }
+\cs_set_eq:NN \LoadClass \__wtpl_load_class:n
+\__wtpl_original_load_class:n { l3doc }
+\cs_set_eq:NN \LoadClass \__wtpl_original_load_class:n
+\cs_set_eq:NN \PassOptionsToClass \__wtpl_original_pass_options_to_class:nn
+
+%% 余白設定（TODO: 要修正）
+\addtolength \oddsidemargin { 50pt }
+\addtolength \evensidemargin { 50pt }
 
 %% 日本語用設定
-\setlength \parindent { 1zh }
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
 %% 専用マクロ
