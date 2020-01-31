@@ -11,7 +11,7 @@
 %% Note: このファイルは日本語文字を含みます.
 
 %% 依存パッケージ
-\RequirePackage{expl3,xparse,bxghost,tcolorbox}
+\RequirePackage{expl3,xparse,tcolorbox}
 \tcbuselibrary{skins,breakable,xparse}
 
 %% クラス宣言
@@ -71,12 +71,13 @@
 %% 日本語用設定
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
-%% 専用マクロ
-\NewExpandableDocumentCommand { \eghost } {} { \eghostguarded {} }
+%% ゴースト保護
+\RequirePackage [ verb ] { bxghost }
 \DeclareDocumentCommand { \code } { m }
   { \eghostguarded { \texttt {#1} } }
-
-%% マクロの上書き
+\cs_new_eq:NN \__wtpl_enquote:n \enquote
+\DeclareDocumentCommand { \enquote } { m }
+  { \eghostguarded { \__wtpl_enquote:n {#1} } }
 \cs_new_eq:NN \__wtpl_codedoc_cmd:nn \__codedoc_cmd:nn
 \cs_set_protected:Npn \__codedoc_cmd:nn #1#2
   { \eghostguarded { \__wtpl_codedoc_cmd:nn {#1} {#2} } }
