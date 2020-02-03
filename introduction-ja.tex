@@ -6,11 +6,22 @@
 %   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
 % ]
 % +++
-\documentclass[dvipdfmx,full,kernel]{wtpl3doc}
+\documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
+
+\usepackage{enumitem}
 
 \begin{document}
-\title{Introduction to \pkg{expl3} and this document}
 
+%\title{Introduction to \pkg{expl3} and this document}
+\title{\pkg{expl3}および本ドキュメントのイントロダクション}
+%\author{%
+% The \LaTeX3 Project\thanks
+%   {%
+%     E-mail:
+%       \href{mailto:latex-team@latex-project.org}
+%         {latex-team@latex-project.org}%
+%   }%
+%}
 \author{%
  \LaTeX3プロジェクト\thanks
    {%
@@ -19,185 +30,343 @@
          {latex-team@latex-project.org}%
    }%
 }
+%\date{Released 2020-01-22}
+\date{バージョン 2020-01-22}
 
 \maketitle
 
-This document is intended to act as a comprehensive reference manual
-for the \pkg{expl3} language. A general guide to the \LaTeX3
-programming language is found in \href{expl3.pdf}{expl3.pdf}.
+%This document is intended to act as a comprehensive reference manual
+%for the \pkg{expl3} language. A general guide to the \LaTeX3
+%programming language is found in \href{expl3.pdf}{expl3.pdf}.
+このドキュメントは\pkg{expl3}言語の網羅的なリファレンスマニュアルとして
+作成されたものです．\LaTeX3プログラミング言語の一般的な概説については
+\href{expl3.pdf}{expl3.pdf}を参照してください．
 
-\section{Naming functions and variables}
+%\section{Naming functions and variables}
+\section{関数と変数の名前}
 
-\LaTeX3 does not use \texttt{@} as a \enquote{letter} for defining
-internal macros.  Instead, the symbols |_| and \texttt{:}
-are used in internal macro names to provide structure. The name of
-each \emph{function} is divided into logical units using \texttt{_},
-while \texttt{:} separates the \emph{name} of the function from the
-\emph{argument specifier} (\enquote{arg-spec}). This describes the arguments
-expected by the function. In most cases, each argument is represented
-by a single letter. The complete list of arg-spec letters for a function
-is referred to as the \emph{signature} of the function.
+%\LaTeX3 does not use \texttt{@} as a \enquote{letter} for defining
+%internal macros.  Instead, the symbols |_| and \texttt{:}
+%are used in internal macro names to provide structure. The name of
+%each \emph{function} is divided into logical units using \texttt{_},
+%while \texttt{:} separates the \emph{name} of the function from the
+%\emph{argument specifier} (\enquote{arg-spec}). This describes the arguments
+%expected by the function. In most cases, each argument is represented
+%by a single letter. The complete list of arg-spec letters for a function
+%is referred to as the \emph{signature} of the function.
+\LaTeX3では\code{@}を内部マクロ定義のための\enquote{letter}として使用
+しません．代わりに|_|と\code{:}が内部マクロに構造を持たせる目的で使用
+されます．各関数の名前は|_|によって論理的な単位ごとに区切られ，さらに
+\code{:}によって関数の\emph{名前}と\emph{引数指定子}
+(\enquote{arg-spec}) に分けられます．引数指定子は，その関数が取る引数
+の形を表すものです．ほとんどの場合，1つの引数は1文字の引数指定子に
+よって表現されます．ある関数が取る引数の数だけ引数指定子を並べた文字列
+は，その関数の\emph{サイン}と見なすことができます．
 
-Each function name starts with the \emph{module} to which it belongs.
-Thus apart from a small number of very basic functions, all \pkg{expl3}
-function names contain at least one underscore to divide the module
-name from the descriptive name of the function. For example, all
-functions concerned with comma lists are in module \texttt{clist} and
-begin |\clist_|.
+%Each function name starts with the \emph{module} to which it belongs.
+%Thus apart from a small number of very basic functions, all \pkg{expl3}
+%function names contain at least one underscore to divide the module
+%name from the descriptive name of the function. For example, all
+%functions concerned with comma lists are in module \texttt{clist} and
+%begin |\clist_|.
+各関数の名前は，その関数が属する\emph{モジュール}名から始まります．
+したがって，少数のごく基本的な関数を除き，すべての\pkg{expl3}関数名
+にはモジュール名の部分を関数の説明的な名前と分離するためのアンダー
+スコアが少なくとも1つ含まれています．例えば，カンマ区切りリストを扱う
+すべての関数は\code{clist}モジュールに含まれていて，それらの名前は必ず
+|\clist_|で始まります．
 
-Every function must include an argument specifier. For functions which
-take no arguments, this will be blank and the function name will end
-\texttt{:}. Most functions take one or more arguments, and use the
-following argument specifiers:
-\begin{description}
-  \item[\texttt{N} and \texttt{n}] These mean \emph{no manipulation},
-    of a single token for \texttt{N} and of a set of tokens given in
-    braces for \texttt{n}. Both pass the argument through exactly as
-    given. Usually, if you use a single token for an \texttt{n} argument,
-    all will be well.
-  \item[\texttt{c}] This means \emph{csname}, and indicates that the
-    argument will be turned into a csname before being used. So
-    |\foo:c| |{ArgumentOne}| will act in the same way as |\foo:N|
-    |\ArgumentOne|.
-  \item[\texttt{V} and \texttt{v}] These mean \emph{value
-    of variable}. The \texttt{V} and \texttt{v} specifiers are used to
-    get the content of a variable without needing to worry about the
-    underlying \TeX{} structure containing the data. A \texttt{V}
-    argument will be a single token (similar to \texttt{N}), for example
-    |\foo:V| |\MyVariable|; on the other hand, using \texttt{v} a
-    csname is constructed first, and then the value is recovered, for
-    example |\foo:v| |{MyVariable}|.
-  \item[\texttt{o}] This means \emph{expansion once}. In general, the
-    \texttt{V} and \texttt{v} specifiers are favoured over \texttt{o}
-    for recovering stored information. However, \texttt{o} is useful
-    for correctly processing information with delimited arguments.
-  \item[\texttt{x}] The \texttt{x} specifier stands for \emph{exhaustive
-    expansion}: every token in the argument is fully expanded until only
-    unexpandable ones remain. The \TeX{} \tn{edef} primitive carries out
-    this type of expansion. Functions which feature an \texttt{x}-type
-    argument are \emph{not} expandable.
-  \item[\texttt{e}] The \texttt{e} specifier is in many respects
-    identical to \texttt{x}, but with a very different implementation.
-    Functions which feature an \texttt{e}-type argument may be
-    expandable.  The drawback is that \texttt{e} is extremely slow
-    (often more than $200$ times slower) in older engines, more
-    precisely in non-\LuaTeX{} engines older than 2019.
-  \item[\texttt{f}] The \texttt{f} specifier stands for \emph{full
-    expansion}, and in contrast to \texttt{x} stops at the first
-    non-expandable token (reading the argument from left to right) without
-    trying to expand it. If this token is a \meta{space token}, it is gobbled,
-    and thus won't be part of the resulting argument. For example, when
-    setting a token list variable (a macro used for storage), the sequence
+%Every function must include an argument specifier. For functions which
+%take no arguments, this will be blank and the function name will end
+%\texttt{:}. Most functions take one or more arguments, and use the
+%following argument specifiers:
+すべての関数名には引数指定子が含まれていなければなりません．引数を
+取らない関数については，引数指定子の部分は空文字列となり，その関数名は
+\code{:}で終わることになります．多くの関数は1つ以上の引数を取り，以下の
+引数指定子を使用することになります：
+%
+\begin{description}[style=multiline, leftmargin=3zw]
+%  \item[\texttt{N} and \texttt{n}] These mean \emph{no manipulation},
+%    of a single token for \texttt{N} and of a set of tokens given in
+%    braces for \texttt{n}. Both pass the argument through exactly as
+%    given. Usually, if you use a single token for an \texttt{n} argument,
+%    all will be well.
+  \item[\code{N}/\code{n}] これらは\emph{操作なし} (no manipulation)
+    を意味します．\code{N}は単一トークン，\code{n}はブレースで囲われた
+    トークン列です．いずれの引数も関数にそのまま渡されることになります．
+    通常，\code{n}タイプの引数に単一トークンを与えたとしても，特に問題
+    は起こりません．
+%
+%  \item[\texttt{c}] This means \emph{csname}, and indicates that the
+%    argument will be turned into a csname before being used. So
+%    |\foo:c| |{ArgumentOne}| will act in the same way as |\foo:N|
+%    |\ArgumentOne|.
+  \item[\code{c}] これは\emph{制御綴名} (csname) の意味で，このタイプの
+    引数は使用される前に制御綴名に変換されることを示しています．つまり
+    |\foo:c {ArgumentOne}|は|\foo:N \ArgumentOne|とまったく同じ挙動を
+    することになります．
+%
+%  \item[\texttt{V} and \texttt{v}] These mean \emph{value
+%    of variable}. The \texttt{V} and \texttt{v} specifiers are used to
+%    get the content of a variable without needing to worry about the
+%    underlying \TeX{} structure containing the data. A \texttt{V}
+%    argument will be a single token (similar to \texttt{N}), for example
+%    |\foo:V| |\MyVariable|; on the other hand, using \texttt{v} a
+%    csname is constructed first, and then the value is recovered, for
+%    example |\foo:v| |{MyVariable}|.
+  \item[\code{V}/\code{v}] これらは\emph{変数の値} (value of variable)
+    を意味しています．この2つの指定子は，ある変数がもつ値を，その実装に
+    用いられている\TeX レベルの構造を考慮することなく取得するためのもの
+    です．\code{V}タイプの引数は（\code{N}と同様の）単一トークンです．
+    |\foo:V \MyVariable|のように使用します．一方で\code{v}を使用した
+    場合は，まず制御綴に変換され，その上で変数の値が取り出されます．
+    具体的には|\foo:v {MyVariable}|のように使用します．
+%
+%  \item[\texttt{o}] This means \emph{expansion once}. In general, the
+%    \texttt{V} and \texttt{v} specifiers are favoured over \texttt{o}
+%    for recovering stored information. However, \texttt{o} is useful
+%    for correctly processing information with delimited arguments.
+  \item[\code{o}] これは\emph{一回展開} (expand once) を意味します．
+    一般には変数に格納されている情報を取り出す際には\code{V}/\code{v}を
+    用いる方が好ましいです．しかし\code{o}はデリミタ区切りの引数を正しく
+    処理する際に有用です．
+%
+%  \item[\texttt{x}] The \texttt{x} specifier stands for \emph{exhaustive
+%    expansion}: every token in the argument is fully expanded until only
+%    unexpandable ones remain. The \TeX{} \tn{edef} primitive carries out
+%    this type of expansion. Functions which feature an \texttt{x}-type
+%    argument are \emph{not} expandable.
+  \item[\code{x}] これは\emph{完全展開} (exhaustive expansion) を意味して
+    います．このタイプの引数に含まれるすべてのトークンは展開不能なもののみ
+    が残る状態まで徹底的に展開されます．この動作は\TeX の\tn{edef}プリミ
+    ティブによって実現されています．\code{x}タイプの引数をとる関数は展開
+    可能では\emph{ありません}．
+%
+%  \item[\texttt{e}] The \texttt{e} specifier is in many respects
+%    identical to \texttt{x}, but with a very different implementation.
+%    Functions which feature an \texttt{e}-type argument may be
+%    expandable.  The drawback is that \texttt{e} is extremely slow
+%    (often more than $200$ times slower) in older engines, more
+%    precisely in non-\LuaTeX{} engines older than 2019.
+  \item[\code{e}] これはさまざまな点で\code{x}と同様ですが，それぞれの
+    実装は大きく異なっています．このタイプの引数をもつ関数は完全展開
+    可能たり得ます．タイプ\code{e}の欠点は古い\TeX 処理系（具体的には
+    2019年以前の\LuaTeX 以外の処理系）では処理が極めて低速（200倍以上
+    遅いことが多いです）であることです．
+%
+%  \item[\texttt{f}] The \texttt{f} specifier stands for \emph{full
+%    expansion}, and in contrast to \texttt{x} stops at the first
+%    non-expandable token (reading the argument from left to right) without
+%    trying to expand it. If this token is a \meta{space token}, it is gobbled,
+%    and thus won't be part of the resulting argument. For example, when
+%    setting a token list variable (a macro used for storage), the sequence
+  \item[\code{f}] これは\emph{先頭完全展開} (full expansion) を意味して
+    います．\code{x}の場合と異なり，（引数を左から右に読んでいき）最初の
+    展開不能トークンが現れたところで展開が停止します．もし最初の展開不能
+    トークンが\meta{space token}であった場合は，そのトークンは取り除かれ
+    最終的な引数には残りません．例えば，トークンリスト変数（値の保存に
+    用いられるマクロ）を設定する
+%
     \begin{verbatim}
       \tl_set:Nn \l_mya_tl { A }
       \tl_set:Nn \l_myb_tl { B }
       \tl_set:Nf \l_mya_tl { \l_mya_tl \l_myb_tl }
     \end{verbatim}
-    will leave |\l_mya_tl| with the content |A\l_myb_tl|, as |A| cannot
-    be expanded and so terminates expansion before |\l_myb_tl| is considered.
-  \item[\texttt{T} and \texttt{F}] For logic tests, there are the branch
-    specifiers \texttt{T} (\emph{true}) and \texttt{F} (\emph{false}).
-    Both specifiers treat the input in the same way as \texttt{n} (no
-    change), but make the logic much easier to see.
-  \item[\texttt{p}] The letter \texttt{p} indicates \TeX{}
-    \emph{parameters}. Normally this will be used for delimited
-    functions as \pkg{expl3} provides better methods for creating simple
-    sequential arguments.
-  \item[\texttt{w}] Finally, there is the \texttt{w} specifier for
-    \emph{weird} arguments. This covers everything else, but mainly
-    applies to delimited values (where the argument must be terminated
-    by some specified string).
-  \item[\texttt{D}] The \texttt{D} specifier means \emph{do not use}.
-    All of the \TeX{} primitives are initially \cs{let} to a \texttt{D}
-    name, and some are then given a second name.  Only the kernel
-    team should use anything with a \texttt{D} specifier!
+%
+%    will leave |\l_mya_tl| with the content |A\l_myb_tl|, as |A| cannot
+%    be expanded and so terminates expansion before |\l_myb_tl| is considered.
+    というコードは|\l_mya_tl|の値を|A\l_myb_tl|に設定します．|A|は展開不能
+    トークンなので，|\l_myb_tl|を展開する前に展開処理が終了するためです．
+%
+%  \item[\texttt{T} and \texttt{F}] For logic tests, there are the branch
+%    specifiers \texttt{T} (\emph{true}) and \texttt{F} (\emph{false}).
+%    Both specifiers treat the input in the same way as \texttt{n} (no
+%    change), but make the logic much easier to see.
+  \item[\code{T}/\code{F}] 論理テストのために，分岐指定子\code{T} (true)
+    と\code{F} (false) が用意されています．これらの指定子はその入力を
+    \code{n}と同様に扱います（つまり，何も変更しません）が，分岐処理を
+    かなり見やすくします．
+%
+%  \item[\texttt{p}] The letter \texttt{p} indicates \TeX{}
+%    \emph{parameters}. Normally this will be used for delimited
+%    functions as \pkg{expl3} provides better methods for creating simple
+%    sequential arguments.
+  これは\TeX のパラメータ (parameters) を意味しています．通常この指定子は
+  デリミタ付き引数を取る関数定義に使用されますが，\pkg{expl3}にはシンプル
+  な関数に対してはより洗練された方法を提供しています．
+%
+%  \item[\texttt{w}] Finally, there is the \texttt{w} specifier for
+%    \emph{weird} arguments. This covers everything else, but mainly
+%    applies to delimited values (where the argument must be terminated
+%    by some specified string).
+  \item[\code{w}] これは\emph{奇妙な} (weird) 引数のための指定子です．
+    これは上記の分類に当てはまらないすべての引数を表現するためのものです
+    が，主にデリミタ区切りにされる値（そうした引数は必ず特定の文字列で
+    終端が示される必要があります）を扱う際に採用されます．
+%
+%  \item[\texttt{D}] The \texttt{D} specifier means \emph{do not use}.
+%    All of the \TeX{} primitives are initially \cs{let} to a \texttt{D}
+%    name, and some are then given a second name.  Only the kernel
+%    team should use anything with a \texttt{D} specifier!
+  \item[\code{D}] これは\emph{使用不可} (do not use) を意味します．
+    すべての\TeX プリミティブは最初に引数指定子\code{D}をもつ名前に
+    \cs{let}代入され，一部にはさらに別の名称が与えられます．\LaTeX3の
+    カーネル開発者のみが\code{D}指定子をもつ関数を使用すべきです．
 \end{description}
-Notice that the argument specifier describes how the argument is
-processed prior to being passed to the underlying function. For example,
-|\foo:c| will take its argument, convert it to a control sequence and
-pass it to |\foo:N|.
+%
+%Notice that the argument specifier describes how the argument is
+%processed prior to being passed to the underlying function. For example,
+%|\foo:c| will take its argument, convert it to a control sequence and
+%pass it to |\foo:N|.
+引数指定子は，それぞれの引数がその関数本体に渡される前にどう処理されるか
+を示すものであるということに注意してください．例えば|\foo:c|は最初の引数
+をとり，それを制御綴に変換したものを|\foo:N|に渡します．
 
-Variables are named in a similar manner to functions, but begin with
-a single letter to define the type of variable:
-\begin{description}
-  \item[\texttt{c}] Constant: global parameters whose value should not
-    be changed.
-  \item[\texttt{g}] Parameters whose value should only be set globally.
-  \item[\texttt{l}] Parameters whose value should only be set locally.
+%Variables are named in a similar manner to functions, but begin with
+%a single letter to define the type of variable:
+変数の命名規則も関数のそれと似ていますが，変数の種類を表す1文字から始まり
+ます：
+%
+\begin{description}[style=multiline, leftmargin=3zw]
+%  \item[\texttt{c}] Constant: global parameters whose value should not
+%    be changed.
+%  \item[\texttt{g}] Parameters whose value should only be set globally.
+%  \item[\texttt{l}] Parameters whose value should only be set locally.
+  \item[\code{c}] 定数．グローバルで，値は変更されるべきでありません．
+  \item[\code{g}] グローバル変数．その値は必ずグローバルに設定されるべき
+    です．
+  \item[\code{l}] ローカル変数．その値は必ずローカルに設定されるべきです．
 \end{description}
-Each variable name is then build up in a similar way to that of a
-function, typically starting with the module\footnote{The module names are
-  not used in case of generic scratch registers defined in the data
-  type modules, e.g., the
-  \texttt{int} module contains some scratch variables called \cs{l_tmpa_int},
-  \cs{l_tmpb_int}, and so on. In such a case adding the module name up front
-  to denote the module
-  and in the back to indicate the type, as in
-  \texttt{\string\l_int_tmpa_int} would be very unreadable.}  name
-and then a descriptive part.
-Variables end with a short identifier to show the variable type:
-\begin{description}
-  \item[\texttt{clist}] Comma separated list.
-  \item[\texttt{dim}] \enquote{Rigid} lengths.
-  \item[\texttt{fp}] Floating-point values;
-  \item[\texttt{int}] Integer-valued count register.
-  \item[\texttt{muskip}] \enquote{Rubber} lengths for use in
-    mathematics.
-  \item[\texttt{seq}] \enquote{Sequence}: a data-type used to implement
-    lists (with access at both ends) and stacks.
-  \item[\texttt{skip}] \enquote{Rubber} lengths.
-  \item[\texttt{str}] String variables: contain character data.
-  \item[\texttt{tl}] Token list variables: placeholder for a token list.
+%
+%Each variable name is then build up in a similar way to that of a
+%function, typically starting with the module\footnote{The module names are
+%  not used in case of generic scratch registers defined in the data
+%  type modules, e.g., the
+%  \texttt{int} module contains some scratch variables called \cs{l_tmpa_int},
+%  \cs{l_tmpb_int}, and so on. In such a case adding the module name up front
+%  to denote the module
+%  and in the back to indicate the type, as in
+%  \texttt{\string\l_int_tmpa_int} would be very unreadable.}  name
+%and then a descriptive part.
+%Variables end with a short identifier to show the variable type:
+上記の種別の後続部は，各変数の名前は関数と似た構成をもちます．典型的には
+まずモジュール名\footnote{モジュール名は各データ型モジュールにおいて汎用
+目的で確保されているレジスタでは省略されています．例えば\code{int}モジュール
+には\cs{l_tmpa_int}, \cs{l_tmpb_int}という汎用の一時変数が含まれています．
+このような変数については，先頭にモジュール名・末尾にデータ型をおいてしまうと
+\code{\string\l_int_tmpa_int}のように極めて不格好な名前になってしまいます}が
+おかれ，続いて説明的な名前がおかれます．変数名の末尾にはデータ型を表す短い
+識別子がおかれます：
+%
+\begin{description}[style=multiline, leftmargin=5zw]
+%  \item[\texttt{clist}] Comma separated list.
+%  \item[\texttt{dim}] \enquote{Rigid} lengths.
+%  \item[\texttt{fp}] Floating-point values;
+%  \item[\texttt{int}] Integer-valued count register.
+%  \item[\texttt{muskip}] \enquote{Rubber} lengths for use in
+%    mathematics.
+%  \item[\texttt{seq}] \enquote{Sequence}: a data-type used to implement
+%    lists (with access at both ends) and stacks.
+%  \item[\texttt{skip}] \enquote{Rubber} lengths.
+%  \item[\texttt{str}] String variables: contain character data.
+%  \item[\texttt{tl}] Token list variables: placeholder for a token list.
+  \item[\code{clist}] カンマ区切りリスト
+  \item[\code{dim}] 寸法 (\enquote{rigid} length) 
+  \item[\code{fp}] 浮動小数点数
+  \item[\code{int}] 整数カウンタレジスタ
+  \item[\code{muskip}] 数式用スキップ (\enquote{rubber} length)
+  \item[\code{seq}] \emph{シークエンス}：両端からアクセス可能なリストと
+    スタックを実装するのに用いられるデータ構造
+  \item[\code{skip}] スキップ (\enquote{rubber} length)
+  \item[\code{str}] 文字列変数：文字データを含むもの
+  \item[\code{tl}] トークンリスト変数：トークンリストを格納するもの
 \end{description}
-Applying \texttt{V}-type or \texttt{v}-type expansion to variables of
-one of the above types is supported, while it is not supported for the
-following variable types:
-\begin{description}
-  \item[\texttt{bool}] Either true or false.
-  \item[\texttt{box}] Box register.
-  \item[\texttt{coffin}] A \enquote{box with handles} --- a higher-level
-    data type for carrying out \texttt{box} alignment operations.
-  \item[\texttt{flag}] Integer that can be incremented expandably.
-  \item[\texttt{fparray}] Fixed-size array of floating point values.
-  \item[\texttt{intarray}] Fixed-size array of integers.
-  \item[\texttt{ior}/\texttt{iow}] An input or output stream, for
-    reading from or writing to, respectively.
-  \item[\texttt{prop}] Property list: analogue of dictionary or
-    associative arrays in other languages.
-  \item[\texttt{regex}] Regular expression.
+%
+%Applying \texttt{V}-type or \texttt{v}-type expansion to variables of
+%one of the above types is supported, while it is not supported for the
+%following variable types:
+上記のデータ型の変数については\code{V}タイプおよび\code{v}タイプの展開が
+サポートされていますが，以下のデータ型についてはサポートされていません：
+%
+\begin{description}[style=multiline, leftmargin=5zw]
+%  \item[\texttt{bool}] Either true or false.
+%  \item[\texttt{box}] Box register.
+%  \item[\texttt{coffin}] A \enquote{box with handles} --- a higher-level
+%    data type for carrying out \texttt{box} alignment operations.
+%  \item[\texttt{flag}] Integer that can be incremented expandably.
+%  \item[\texttt{fparray}] Fixed-size array of floating point values.
+%  \item[\texttt{intarray}] Fixed-size array of integers.
+%  \item[\texttt{ior}/\texttt{iow}] An input or output stream, for
+%    reading from or writing to, respectively.
+%  \item[\texttt{prop}] Property list: analogue of dictionary or
+%    associative arrays in other languages.
+%  \item[\texttt{regex}] Regular expression.
+\item[\code{bool}] 真 (true) または偽 (false)
+\item[\code{box}] ボックスレジスタ
+\item[\code{coffin}] 高機能ボックス：ボックス配列操作のための高級なデータ
+  構造
+\item[\code{flag}] 展開限定文脈でインクリメント可能な整数
+\item[\code{fparray}] 浮動小数点数用の静的配列
+\item[\code{intarray}] 整数用の静的配列
+\item[\code{ior}/\code{iow}] 入出力ストリーム
+\item[\code{prop}] プロパティリスト：他言語の辞書や連想配列に相当
+\item[\code{regex}] 正規表現
 \end{description}
 
-\subsection{Terminological inexactitude}
+%\subsection{Terminological inexactitude}
+\subsection{言語的不正確 (terminological inexactitude)}
 
-A word of warning. In this document, and others referring to the \pkg{expl3}
-programming modules, we often refer to \enquote{variables} and
-\enquote{functions} as if they
-were actual constructs from a real programming language.  In truth, \TeX{}
-is a macro processor, and functions are simply macros that may or may not take
-arguments and expand to their replacement text.  Many of the common variables
-are \emph{also} macros, and if placed into the input stream will simply expand
-to their definition as well~--- a \enquote{function} with no arguments and a
-\enquote{token list variable} are almost the same.\footnote{\TeX{}nically,
-functions with no arguments are \tn{long} while token list variables are not.}
-On the other
-hand, some \enquote{variables} are actually registers that must be
-initialised and their values set and retrieved with specific functions.
+%A word of warning. In this document, and others referring to the \pkg{expl3}
+%programming modules, we often refer to \enquote{variables} and
+%\enquote{functions} as if they
+%were actual constructs from a real programming language.  In truth, \TeX{}
+%is a macro processor, and functions are simply macros that may or may not take
+%arguments and expand to their replacement text.  Many of the common variables
+%are \emph{also} macros, and if placed into the input stream will simply expand
+%to their definition as well~--- a \enquote{function} with no arguments and a
+%\enquote{token list variable} are almost the same.\footnote{\TeX{}nically,
+%functions with no arguments are \tn{long} while token list variables are not.}
+%On the other
+%hand, some \enquote{variables} are actually registers that must be
+%initialised and their values set and retrieved with specific functions.
+これは警告です．このドキュメント，およびその他の\pkg{expl3}プログラミング
+モジュールについて述べる文書において，しばしば「変数」や「関数」という用語は
+それらがあたかも真のプログラミング言語の構成要素であるかのように使用されます．
+しかし実際には，\TeX はマクロ処理系であり，関数は時に引数をとり，また時に
+引数をとらずにその置換テキストへと展開されます．多くの一般的なマクロも
+\emph{やはり}マクロであり，入力ストリームに置かれた場合はその定義に従って
+関数と同様に展開されることになります．つまり引数のない「関数」と「トークン
+リスト変数」はほぼ同じものです\footnote{{\TeX}nicalには引数のない関数は
+\tn{long}有効なマクロなのに対し，トークンリスト変数はそうではないという
+違いはあります．}．一方で，いくつかの変数は一部の「変数」は実体がレジスタ
+で，使用前には初期化が，その値の設定や取得には専用の関数が必要です．
 
-The conventions of the \pkg{expl3} code are designed to clearly separate the
-ideas of \enquote{macros that contain data} and
-\enquote{macros that contain code}, and a
-consistent wrapper is applied to all forms of \enquote{data} whether they be
-macros or
-actually registers.  This means that sometimes we will use phrases like
-\enquote{the function returns a value}, when actually we just mean
-\enquote{the macro expands to something}. Similarly, the term
-\enquote{execute} might be used in place of \enquote{expand}
-or it might refer to the more specific case of
-\enquote{processing in \TeX's stomach}
-(if you are familiar with the \TeX{}book parlance).
+%The conventions of the \pkg{expl3} code are designed to clearly separate the
+%ideas of \enquote{macros that contain data} and
+%\enquote{macros that contain code}, and a
+%consistent wrapper is applied to all forms of \enquote{data} whether they be
+%macros or
+%actually registers.  This means that sometimes we will use phrases like
+%\enquote{the function returns a value}, when actually we just mean
+%\enquote{the macro expands to something}. Similarly, the term
+%\enquote{execute} might be used in place of \enquote{expand}
+%or it might refer to the more specific case of
+%\enquote{processing in \TeX's stomach}
+%(if you are familiar with the \TeX{}book parlance).
+\pkg{expl3}コードの習慣は「データを格納するためのマクロ」と「コードを含む
+マクロ」を明確に区別し，あらゆる「データ」について，その実体がマクロであれ
+レジスタであれ一貫したラッパををもつように設計されています．そのため時として
+実際には単に「マクロが何かに展開される」ことを「関数が値を返す」というように
+表現する場合があります．同様に「実行する」という表現は単に「展開」を意味して
+いるか，あるいは特定のケースでは「\TeX のお腹で処理が行なわれる」（これは
+『\TeX ブック』の用語に詳しい人向けの表現です）ということを意味しています．
 
-If in doubt, please ask; chances are we've been hasty in writing certain
-definitions and need to be told to tighten up our terminology.
+%If in doubt, please ask; chances are we've been hasty in writing certain
+%definitions and need to be told to tighten up our terminology.
+もしこの方針を疑うならば，お知らせください．もしかすると，私たちはより厳密な
+定義を書く下す余裕がないほどせっかちだったかもしれません．その場合，私たちの
+用語を整理する必要があると指摘される必要があります．
+%% !! この訳は自信がない !!
 
 \section{Documentation conventions}
 
