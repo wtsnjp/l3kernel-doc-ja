@@ -71,6 +71,30 @@
 %% 日本語用設定
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
+% 目次（jsarticle の設定をリバート）
+\cs_gset:Npn \l@section #1#2
+  {
+    \ifnum \c@tocdepth >\z@
+      \addpenalty{\@secpenalty}%
+      \addvspace{1.0em \@plus\jsc@mpt}%
+      \begingroup
+        \parindent\z@
+        \rightskip\@tocrmarg
+        \parfillskip-\rightskip
+        \leavevmode\headfont
+        %\setlength\@lnumwidth{4zw}% 元1.5em [2003-03-02]
+        \setlength\@lnumwidth{\jsc@tocl@width}\advance\@lnumwidth 2zw
+        \advance\leftskip\@lnumwidth \hskip-\leftskip
+        #1\nobreak\hfil\nobreak\hbox to\@pnumwidth{\hss#2}\par
+      \endgroup
+    \fi
+  }
+\cs_gset:Npn \l@subsection
+  {
+    \@tempdima\jsc@tocl@width \advance\@tempdima -1zw
+    \@dottedtocline{2}{\@tempdima}{3zw}
+  }
+
 %% ゴースト保護
 \RequirePackage [ verb ] { bxghost }
 \DeclareDocumentCommand { \code } { m }

@@ -7,8 +7,7 @@
 % ]
 % +++
 \documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
-
-\usepackage{enumitem}
+\usepackage{interface3-ja}
 
 \begin{document}
 
@@ -55,9 +54,9 @@
 %by a single letter. The complete list of arg-spec letters for a function
 %is referred to as the \emph{signature} of the function.
 \LaTeX3では\code{@}を内部マクロ定義のための\enquote{letter}として使用
-しません．代わりに|_|と\code{:}が内部マクロに構造を持たせる目的で使用
-されます．各関数の名前は|_|によって論理的な単位ごとに区切られ，さらに
-\code{:}によって関数の\emph{名前}と\emph{引数指定子}
+しません．代わりに\code{_}と\code{:}が内部マクロに構造を持たせる目的で
+使用されます．各関数の名前は\code{_}によって論理的な単位ごとに区切られ，
+さらに\code{:}によって関数の\emph{名前}と\emph{引数指定子}
 (\enquote{arg-spec}) に分けられます．引数指定子は，その関数が取る引数
 の形を表すものです．ほとんどの場合，1つの引数は1文字の引数指定子に
 よって表現されます．ある関数が取る引数の数だけ引数指定子を並べた文字列
@@ -368,147 +367,239 @@
 用語を整理する必要があると指摘される必要があります．
 %% !! この訳は自信がない !!
 
-\section{Documentation conventions}
+%\section{Documentation conventions}
+\section{このドキュメントについて}
 
-This document is typeset with the experimental \pkg{l3doc} class;
-several conventions are used to help describe the features of the code.
-A number of conventions are used here to make the documentation clearer.
+%This document is typeset with the experimental \pkg{l3doc} class;
+%several conventions are used to help describe the features of the code.
+%A number of conventions are used here to make the documentation clearer.
+このドキュメントは実験的なクラス\pkg{l3doc}で作成されています．このクラス
+ではコードの特徴を示すのにいくつかのルールがあります．そして，その多くが
+説明をより明確にするために本ドキュメントでも用いられています．
 
-Each group of related functions is given in a box. For a function with
-a \enquote{user} name, this might read:
+%Each group of related functions is given in a box. For a function with
+%a \enquote{user} name, this might read:
+関連する関数はグループごとに1つのボックスに入れられます．「ユーザ」向け
+の関数であれば，次のようになります：
+%
 \begin{function}[label = ]{\ExplSyntaxOn, \ExplSyntaxOff}
   \begin{syntax}
     |\ExplSyntaxOn| \dots{} |\ExplSyntaxOff|
   \end{syntax}
-  The textual description of how the function works would appear here. The
-  syntax of the function is shown in mono-spaced text to the right of
-  the box. In this example, the function takes no arguments and so the
-  name of the function is simply reprinted.
+%  The textual description of how the function works would appear here. The
+%  syntax of the function is shown in mono-spaced text to the right of
+%  the box. In this example, the function takes no arguments and so the
+%  name of the function is simply reprinted.
+  当該の関数がどのように働くかについてのテキスト情報はここに記述されます．
+  関数のシンタックスはボックスの右側に等幅フォントで示されます．この例では
+  関数は引数を取らないので，単純に関数名が反復されるだけになっています．
 \end{function}
 
-For programming functions, which use \texttt{_} and \texttt{:} in their name
-there are a few additional conventions: If two related functions are given
-with identical names but different argument specifiers, these are termed
-\emph{variants} of each other, and the latter functions are printed in grey to
-show this more clearly. They will carry out the same function but will take
-different types of argument:
+%For programming functions, which use \texttt{_} and \texttt{:} in their name
+%there are a few additional conventions: If two related functions are given
+%with identical names but different argument specifiers, these are termed
+%\emph{variants} of each other, and the latter functions are printed in grey to
+%show this more clearly. They will carry out the same function but will take
+%different types of argument:
+名前に\code{_}と\code{:}を含むプログラミング関数については，もういくつかの
+表記上のルールがあります．もし2つの関数が同一の名前をもち，引数指定子だけ
+が異なる場合，これらは互いに\emph{変種}であるといい，変種であることをより
+明確に表すために後に出てくる関数はグレーで表示されます．変種は同一の機能を
+もっていますが，異なるタイプの引数を取ります：
+%
 \begin{function}[label = ]{\seq_new:N, \seq_new:c}
   \begin{syntax}
     |\seq_new:N| \meta{sequence}
   \end{syntax}
-  When a number of variants are described, the arguments are usually
-  illustrated only for the base function. Here, \meta{sequence} indicates
-  that |\seq_new:N| expects the name of a sequence. From the argument
-  specifier, |\seq_new:c| also expects a sequence name, but as a
-  name rather than as a control sequence. Each argument given in the
-  illustration should be described in the following text.
+%  When a number of variants are described, the arguments are usually
+%  illustrated only for the base function. Here, \meta{sequence} indicates
+%  that |\seq_new:N| expects the name of a sequence. From the argument
+%  specifier, |\seq_new:c| also expects a sequence name, but as a
+%  name rather than as a control sequence. Each argument given in the
+%  illustration should be described in the following text.
+  複数の変種が同時に説明される場合，通常は基本となる関数1つについてのみ
+  シンタックスが表示されます．ここで\meta{sequence}は|\seq_new:N|が
+  シークエンス変数をとることを示しています．|\seq_new:c|もやはりシーク
+  エンス変数をとりますが，引数指定子から制御綴ではなく名前の形でとると
+  いうことがわかります．シンタックス表示に現れる各引数は，普通それに続く
+  テキストで説明されます．
 \end{function}
 
-\paragraph{Fully expandable functions}
-\hypertarget{expstar}{Some functions are fully expandable},
-which allows them to be used within
-an \texttt{x}-type or \texttt{e}-type argument (in plain \TeX{} terms, inside an \tn{edef} or \tn{expanded}),
-as well as within an \texttt{f}-type argument.
-These fully expandable functions are indicated in the documentation by
-a star:
+%\paragraph{Fully expandable functions}
+\paragraph{完全展開可能な関数}
+%
+%\hypertarget{expstar}{Some functions are fully expandable},
+%which allows them to be used within
+%an \texttt{x}-type or \texttt{e}-type argument (in plain \TeX{} terms, inside an \tn{edef} or \tn{expanded}),
+%as well as within an \texttt{f}-type argument.
+%These fully expandable functions are indicated in the documentation by
+%a star:
+\hypertarget{expstar}{一部の関数は完全展開可能です}．完全展開可能な関数
+は\code{x}タイプや\code{e}タイプの引数（\TeX 言語の用語で言えば
+\tn{edef}や\tn{expanded}の中）に加え，\code{f}タイプの引数の中でも使用
+することができます．このような完全展開可能な関数は，このドキュメントでは
+星印（アスタリスク）で明示されます：
+%
 \begin{function}[EXP, label = ]{\cs_to_str:N}
   \begin{syntax}
     |\cs_to_str:N| \meta{cs}
   \end{syntax}
-  As with other functions, some text should follow which explains how
-  the function works. Usually, only the star will indicate that the
-  function is expandable. In this case, the function expects a \meta{cs},
-  shorthand for a \meta{control sequence}.
+%  As with other functions, some text should follow which explains how
+%  the function works. Usually, only the star will indicate that the
+%  function is expandable. In this case, the function expects a \meta{cs},
+%  shorthand for a \meta{control sequence}.
+  他の関数と同様，この位置には当該関数がどのように働くのかについて説明
+  されます．通常，その関数が展開可能であるかどうかは星印の有無によって
+  のみ表示されます．ところで，ここでの\meta{cs}は\meta{control
+  sequence}の短縮形です．
 \end{function}
 
-\paragraph{Restricted expandable functions}
-\hypertarget{rexpstar}{A few functions are fully expandable} but cannot be fully expanded within
-an \texttt{f}-type argument. In this case a hollow star is used to indicate
-this:
+%\paragraph{Restricted expandable functions}
+\paragraph{制限付き完全展開可能関数}
+%
+%\hypertarget{rexpstar}{A few functions are fully expandable} but cannot be fully expanded within
+%an \texttt{f}-type argument. In this case a hollow star is used to indicate
+%this:
+\hypertarget{rexpstar}{ごく一部ですが}，完全展開可能ではあるものの
+\code{f}タイプの引数では完全展開されないものもあります．このような関数
+には白抜きの星印が付けられます：
+%
 \begin{function}[rEXP, label = ]{\seq_map_function:NN}
   \begin{syntax}
     |\seq_map_function:NN| \meta{seq} \meta{function}
   \end{syntax}
 \end{function}
 
-\paragraph{Conditional functions}
-\hypertarget{explTF}{Conditional (\texttt{if}) functions}
-are normally defined in three variants, with
-\texttt{T}, \texttt{F} and \texttt{TF} argument specifiers. This allows
-them to be used for different \enquote{true}/\enquote{false} branches,
-depending on
-which outcome the conditional is being used to test. To indicate this
-without repetition, this information is given in a shortened form:
+%\paragraph{Conditional functions}
+\paragraph{条件分岐関数}
+%
+%\hypertarget{explTF}{Conditional (\texttt{if}) functions}
+%are normally defined in three variants, with
+%\texttt{T}, \texttt{F} and \texttt{TF} argument specifiers. This allows
+%them to be used for different \enquote{true}/\enquote{false} branches,
+%depending on
+%which outcome the conditional is being used to test. To indicate this
+%without repetition, this information is given in a shortened form:
+\hypertarget{explTF}{条件分岐関数}（一般に\code{if}を含むもの）には通常
+\code{T}, \code{F}, \code{TF}という3パターンの引数指定子をもつ変種が存在
+します．これらの変種の存在によって，対象となる条件の真偽判定結果のどちら
+か一方または両者を使いたいときにも対応することができます．この3パターンの
+存在を繰り返しなく表現するため，次のような省略表記を用います：
+%
 \begin{function}[EXP,TF, label = ]{\sys_if_engine_xetex:}
   \begin{syntax}
     |\sys_if_engine_xetex:TF| \Arg{true code} \Arg{false code}
   \end{syntax}
-  The underlining and italic of \texttt{TF} indicates that three functions
-  are available:
+%  The underlining and italic of \texttt{TF} indicates that three functions
+%  are available:
+  下線付きの斜体で表示されている\code{TF}は次の3つの関数が利用可能である
+  ことを示しています：
+%
   \begin{itemize}
     \item |\sys_if_engine_xetex:T|
     \item |\sys_if_engine_xetex:F|
     \item |\sys_if_engine_xetex:TF|
   \end{itemize}
-  Usually, the illustration
-  will use the \texttt{TF} variant, and so both \meta{true code}
-  and \meta{false code} will be shown. The two variant forms \texttt{T} and
-  \texttt{F} take only \meta{true code} and \meta{false code}, respectively.
-  Here, the star also shows that this function is expandable.
-  With some minor exceptions, \emph{all} conditional functions in the
-  \pkg{expl3} modules should be defined in this way.
+%
+%  Usually, the illustration
+%  will use the \texttt{TF} variant, and so both \meta{true code}
+%  and \meta{false code} will be shown. The two variant forms \texttt{T} and
+%  \texttt{F} take only \meta{true code} and \meta{false code}, respectively.
+%  Here, the star also shows that this function is expandable.
+%  With some minor exceptions, \emph{all} conditional functions in the
+%  \pkg{expl3} modules should be defined in this way.
+  通常，シンタックス表示には\code{TF}変種が用いられ，したがって\meta{true
+  code}と\meta{false code}の両方が現れているはずです．引数指定子\code{T},
+  \code{F}をもつ変種は，それぞれ\meta{true code}と\meta{false code}のうち
+  一方だけを引数に取ります．また，この関数は星印が付いており完全展開可能
+  です．数少ない例外を除いては，\pkg{expl3}モジュールが提供する\emph{ほと
+  んどの}条件分岐関数は完全展開可能なように定義されています．
 \end{function}
 
-Variables, constants and so on are described in a similar manner:
+%Variables, constants and so on are described in a similar manner:
+変数や定数も同様の方法で説明されます：
+%
 \begin{variable}[label = ]{\l_tmpa_tl}
-  A short piece of text will describe the variable: there is no
-  syntax illustration in this case.
+%  A short piece of text will describe the variable: there is no
+%  syntax illustration in this case.
+  一般に変数の説明は短く，シンタックス表示もありません．
 \end{variable}
 
-In some cases, the function is similar to one in \LaTeXe{} or plain \TeX{}.
-In these cases, the text will include an extra \enquote{\textbf{\TeX{}hackers
-note}} section:
+%In some cases, the function is similar to one in \LaTeXe{} or plain \TeX{}.
+%In these cases, the text will include an extra \enquote{\textbf{\TeX{}hackers
+%note}} section:
+一部の関数はプリミティブや\LaTeXe やplain \TeX のマクロと類似しています．
+そのような場合，解説におまけの\emph{\TeX 言語者向けノート}枠が付随します．
+%
 \begin{function}[EXP, label = ]{\token_to_str:N}
   \begin{syntax}
     |\token_to_str:N| \meta{token}
   \end{syntax}
-  The normal description text.
+%  The normal description text.
+  通常の解説テキスト．
+%
   \begin{texnote}
-    Detail for the experienced \TeX{} or \LaTeXe\ programmer. In this
-    case, it would point out that this function is the \TeX{} primitive
-    |\string|.
+%    Detail for the experienced \TeX{} or \LaTeXe\ programmer. In this
+%    case, it would point out that this function is the \TeX{} primitive
+%    |\string|.
+    \TeX 言語や\LaTeXe に精通した開発者向けの詳細はここに記述されます．
+    たとえば|\token_to_str:N|の場合，この関数は\TeX プリミティブの
+    |\string|であることが説明されます．
   \end{texnote}
 \end{function}
 
-\paragraph{Changes to behaviour}
-When new functions are added to \pkg{expl3}, the date of first inclusion is
-given in the documentation. Where the documented behaviour of a function
-changes after it is first introduced, the date of the update will also be
-given. This means that the programmer can be sure that any release of
-\pkg{expl3} after the date given will contain the function of interest with
-expected behaviour as described. Note that changes to code internals, including
-bug fixes, are not recorded in this way \emph{unless} they impact on the
-expected behaviour.
+%\paragraph{Changes to behaviour}
+\paragraph{変更履歴}
+%
+%When new functions are added to \pkg{expl3}, the date of first inclusion is
+%given in the documentation. Where the documented behaviour of a function
+%changes after it is first introduced, the date of the update will also be
+%given. This means that the programmer can be sure that any release of
+%\pkg{expl3} after the date given will contain the function of interest with
+%expected behaviour as described. Note that changes to code internals, including
+%bug fixes, are not recorded in this way \emph{unless} they impact on the
+%expected behaviour.
+\pkg{expl3}に新しい関数が追加される場合，その日付はドキュメントに明記されます．
+また文書化されていた挙動が変更される場合は，その更新の日付も明示されます．
+したがって，ドキュメントに記載の日付以降にリリースされた\pkg{expl3}であれば，
+そこに記述された挙動をする関数が含まれていることは保証されます．ただしバグ
+修正を含む内部実装の修正は，仕様たる挙動に影響しない限り，このような方法では
+記録され\emph{ない}ことに注意してください．
 
-\section{Formal language conventions which apply generally}
+%\section{Formal language conventions which apply generally}
+\section{\pkg{expl3}言語における一般則}
 
-As this is a formal reference guide for \LaTeX3 programming, the descriptions
-of functions are intended to be reasonably \enquote{complete}. However, there
-is also a need to avoid repetition. Formal ideas which apply to general
-classes of function are therefore summarised here.
+%As this is a formal reference guide for \LaTeX3 programming, the descriptions
+%of functions are intended to be reasonably \enquote{complete}. However, there
+%is also a need to avoid repetition. Formal ideas which apply to general
+%classes of function are therefore summarised here.
+これは\LaTeX3プログラミングのための形式的なリファレンスガイドなので，関数の
+解説は合理的に「完全」であることが意図されています．一方で，冗長な繰り返しは
+避ける必要があります．そのため，シンタックスに関する基本的なアイデアをここに
+まとめておくことにします．
 
-For tests which have a \texttt{TF} argument specification, the test if
-evaluated to give a logically \texttt{TRUE} or \texttt{FALSE} result.
-Depending on this result, either the \meta{true code} or the \meta{false code}
-will be left in the input stream. In the case where the test is expandable,
-and a predicate (|_p|) variant is available, the logical value determined by
-the test is left in the input stream: this will typically be part of a larger
-logical construct.
+%For tests which have a \texttt{TF} argument specification, the test if
+%evaluated to give a logically \texttt{TRUE} or \texttt{FALSE} result.
+%Depending on this result, either the \meta{true code} or the \meta{false code}
+%will be left in the input stream. In the case where the test is expandable,
+%and a predicate (|_p|) variant is available, the logical value determined by
+%the test is left in the input stream: this will typically be part of a larger
+%logical construct.
+引数指定子\code{TF}をもつ条件分岐関数では，対象となる条件は論理的に
+\code{TRUE}なのか\code{FALSE}なのかを評価されます．その評価結果に基づいて，
+\meta{true code}または\meta{false code}のいずれかが入力ストリームに残されます．
+展開可能な条件分岐については，述語変種 (|_p|, predicate) も提供されています．
+この変種を用いた場合，条件分岐の結果を表す論理値が入力ストリームに残ります．
+通常，これらはより大きな論理条件の中で用いられるものです．
 
-\section{\TeX{} concepts not supported by \LaTeX3{}}
+%\section{\TeX{} concepts not supported by \LaTeX3{}}
+\section{\LaTeX3でサポートされない\TeX 言語の概念}
 
-The \TeX{} concept of an \enquote{\cs{outer}} macro is \emph{not supported}
-at all by \LaTeX3{}. As such, the functions provided here may break when
-used on top of \LaTeXe{} if \cs{outer} tokens are used in the arguments.
+%The \TeX{} concept of an \enquote{\cs{outer}} macro is \emph{not supported}
+%at all by \LaTeX3{}. As such, the functions provided here may break when
+%used on top of \LaTeXe{} if \cs{outer} tokens are used in the arguments.
+\TeX 言語における\cs{outer}付きマクロは\LaTeX3ではまったく\emph{サポート
+されません}．したがって，\pkg{expl3}の関数は\LaTeXe 上で\cs{outer}トークンが
+引数に渡された場合には正しく動作しない可能性があります．
 
 \end{document}
