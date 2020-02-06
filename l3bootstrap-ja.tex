@@ -1,0 +1,144 @@
+% +++
+% sequence = ["latex", "dvipdf"]
+% latex = "uplatex"
+% clean_files = [
+%   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
+%   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
+% ]
+% +++
+\documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
+\usepackage{interface3-ja}
+
+\begin{document}
+
+%\title{The \pkg{l3bootstrap} package\\ Bootstrap code}
+\title{\pkg{l3bootstrap}パッケージ\\ ブートストラップコード}
+%\author{%
+% The \LaTeX3 Project\thanks
+%   {%
+%     E-mail:
+%       \href{mailto:latex-team@latex-project.org}
+%         {latex-team@latex-project.org}%
+%   }%
+%}
+\author{%
+ \LaTeX3プロジェクト\thanks
+   {%
+     E-mail:
+       \href{mailto:latex-team@latex-project.org}
+         {latex-team@latex-project.org}%
+   }%
+}
+%\date{Released 2020-01-22}
+\date{バージョン 2020-01-22}
+
+\maketitle
+
+\begin{documentation}
+
+%\section{Using the \LaTeX3 modules}
+\section{\LaTeX3モジュールを使用する}
+
+%The modules documented in \file{source3} are designed to be used on top of
+%\LaTeXe{} and are loaded all as one with the usual |\usepackage{expl3}| or
+%|\RequirePackage{expl3}| instructions. These modules will also form the
+%basis of the \LaTeX3 format, but work in this area is incomplete and not
+%included in this documentation at present.
+\file{source3}で説明されているモジュールは，\LaTeXe 上で
+|\usepackage{expl3}|または|\RequirePackage{expl3}|によって一括読み込みされる
+ことを意図して設計されています．これらのモジュールは\LaTeX3フォーマットの
+基礎になる予定ですが，その部分については未完成であり，したがって現状この文書
+にはその説明は含まれていません．
+
+%As the modules use a coding syntax different from standard
+%\LaTeXe{} it provides a few functions for setting it up.
+\pkg{expl3}のモジュールは標準的な\LaTeXe のそれとは異なるシンタックスを用いる
+ので，このモジュールではそうした環境をセットアップするための関数をいくつか
+提供しています．
+
+\begin{function}[updated = 2011-08-13]{\ExplSyntaxOn, \ExplSyntaxOff}
+  \begin{syntax}
+    \cs{ExplSyntaxOn} \meta{code} \cs{ExplSyntaxOff}
+  \end{syntax}
+%  The \cs{ExplSyntaxOn} function switches to a category code
+%  r\'{e}gime in which spaces are ignored and in which the colon (|:|)
+%  and underscore (|_|) are treated as \enquote{letters}, thus allowing
+%  access to the names of code functions and variables. Within this
+%  environment, |~| is used to input a space. The \cs{ExplSyntaxOff}
+%  reverts to the document category code r\'{e}gime.
+  \cs{ExplSyntaxOn}関数はカテゴリーコード環境の切り替えを行います．具体的には
+  空白文字は無視されるようになり，またコロン (\code{:}) とアンダースコア
+  (\code{_}) は\enquote{letters}として扱われるようにすることによって関数や
+  変数へのアクセスを可能にします．この環境下では，空白文字の入力にはチルダ
+  (|~|) を使用します．\cs{ExplSyntaxOff}関数はカテゴリーコード環境を元の状態に
+  戻します．
+\end{function}
+
+\begin{function}[updated = 2017-03-19]
+  {\ProvidesExplPackage, \ProvidesExplClass, \ProvidesExplFile}
+  \begin{syntax}
+    |\RequirePackage{expl3}| \\
+    \cs{ProvidesExplPackage} \Arg{package} \Arg{date} \Arg{version} \Arg{description}
+  \end{syntax}
+%  These functions act broadly in the same way as the corresponding
+%  \LaTeXe{} kernel
+%  functions \tn{ProvidesPackage}, \tn{ProvidesClass} and
+%  \tn{ProvidesFile}. However, they also implicitly switch
+%  \cs{ExplSyntaxOn} for the remainder of the code with the file. At the
+%  end of the file, \cs{ExplSyntaxOff} will be called to reverse this.
+%  (This is the same concept as \LaTeXe{} provides in turning on
+%  \tn{makeatletter} within package and class code.) The \meta{date} should
+%  be given in the format \meta{year}/\meta{month}/\meta{day}. If the
+%  \meta{version} is given then it will be prefixed with \texttt{v} in
+%  the package identifier line.
+  これらの関数は概ね\LaTeXe カーネルの\tn{ProvidesPackage},
+  \tn{ProvidesClass}, \tn{ProvidesFile}と同じように動作します．しかし，
+  これらはファイルの終端までを\cs{ExplSyntaxOn}状態へと暗黙的に切り替え
+  ます．ファイルの終端では\cs{ExplSyntaxOff}が呼ばれて元の状態へと戻り
+  ます（これは\LaTeXe がパッケージやクラスのコードでは\tn{makeatletter}%
+  を有効にするのと同様です）．なお\meta{date}は\meta{year}/\meta{month}%
+  /\meta{day}のフォーマットで与えられる必要があります．\meta{version}が
+  与えられた場合には，ログのパッケージ読み込みを示す箇所には\code{v}が
+  前置されます．
+\end{function}
+
+\begin{function}[updated = 2012-06-04]{\GetIdInfo}
+  \begin{syntax}
+    |\RequirePackage{l3bootstrap}|
+    \cs{GetIdInfo} |$Id:| \meta{SVN info field} |$| \Arg{description}
+  \end{syntax}
+%  Extracts all information from a SVN field. Spaces are not
+%  ignored in these fields. The information pieces are stored in
+%  separate control sequences with \cs{ExplFileName} for the part of the
+%  file name leading up to the period, \cs{ExplFileDate} for date,
+%  \cs{ExplFileVersion} for version and \cs{ExplFileDescription} for the
+%  description.
+  すべての情報をSVNフィールドから取得します．このフィールドでは空白文字は
+  無視されません．各種の情報はそれぞれ別の制御綴に格納されます．具体的には
+  ファイル名は\cs{ExplFileName}，日付は\cs{ExplFileDate}，バージョン番号は
+  \cs{ExplFileVersion}，説明は\cs{ExplFileDescription}に格納されます．
+\end{function}
+
+%To summarize: Every single package using this syntax should identify
+%itself using one of the above methods. Special care is taken so that
+%every package or class file loaded with \tn{RequirePackage} or similar
+%are loaded with usual \LaTeXe{} category codes and the \LaTeX3 category code
+%scheme is reloaded when needed afterwards. See implementation for
+%details. If you use the \cs{GetIdInfo} command you can use the
+%information when loading a package with
+まとめると，\pkg{expl3}シンタックスを使用するすべてのパッケージは自身を
+上記のいずれかの方法で宣言する必要があります．あらゆるパッケージまたは
+クラスについて，\tn{RequirePackage}その他の方法で\LaTeXe のカテゴリー
+コード環境下で読み込まれた際にも\LaTeX3カテゴリーコード環境に変更される
+よう特別な処理が行なわれます．詳細については実装パートを確認してください．
+\cs{GetIdInfo}コマンドを使用した場合には，以下のようにすることでその情報
+を読み込みの際に活用することができます：
+%
+\begin{verbatim}
+  \ProvidesExplPackage{\ExplFileName}
+    {\ExplFileDate}{\ExplFileVersion}{\ExplFileDescription}
+\end{verbatim}
+
+\end{documentation}
+
+\end{document}

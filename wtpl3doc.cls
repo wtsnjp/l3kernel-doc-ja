@@ -23,7 +23,7 @@
 % 既知の l3doc オプションは l3doc に渡す
 \clist_const:Nn \c__wtpl_codedoc_options_clist
   {
-    a5paper, full, onlydoc, check, nocheck, checktest, nochecktest,
+    a5paper, onlydoc, check, nocheck, checktest, nochecktest,
     kernel, stdmodule, cm-default, lm-default, cs-break-off,
     cs-break-nohyphen, show-notes, hide-notes,
   }
@@ -32,6 +32,13 @@
     \DeclareOption {#1} {
       \PassOptionsToClass { \CurrentOption } { l3doc }
     }
+  }
+% full について特別の対処
+\bool_new:N \g__wtpl_full_bool
+\DeclareOption { full }
+  {
+    \bool_gset_true:N \g__wtpl_full_bool
+    \PassOptionsToClass { \CurrentOption } { l3doc }
   }
 
 % それ以外は jsarticle に渡す
@@ -44,6 +51,10 @@
 \ProcessOptions \scan_stop:
 
 %% l3doc を読み込む
+% textcomp のオプションクラッシュ防止
+\bool_if:nT { \g__wtpl_full_bool }
+  { \RequirePackage [ full ] { textcomp } }
+
 % l3doc は内部で article を呼ぶので，代わりに jsarticle を呼ぶように細工
 \cs_new_eq:NN \__wtpl_original_load_class:n \LoadClass
 \cs_new_eq:NN \__wtpl_original_pass_options_to_class:nn \PassOptionsToClass
@@ -64,14 +75,14 @@
 \cs_set_eq:NN \LoadClass \__wtpl_original_load_class:n
 \cs_set_eq:NN \PassOptionsToClass \__wtpl_original_pass_options_to_class:nn
 
-%% 余白設定（TODO: 要修正）
+%% 余白設定（TODO: 要検討）
 \addtolength \oddsidemargin { 55pt }
 \addtolength \evensidemargin { 55pt }
 
 %% 日本語用設定
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
 
-% 目次（jsarticle の設定をリバート）
+% 目次（jsarticle の設定を復帰）
 \cs_gset:Npn \l@section #1#2
   {
     \ifnum \c@tocdepth >\z@

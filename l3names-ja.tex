@@ -1,0 +1,77 @@
+% +++
+% sequence = ["latex", "dvipdf"]
+% latex = "uplatex"
+% clean_files = [
+%   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
+%   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
+% ]
+% +++
+\documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
+\usepackage{interface3-ja}
+
+\begin{document}
+
+%\title{The \pkg{l3names} package\\ Namespace for primitives}
+\title{\pkg{l3names}パッケージ\\ プリミティブのための名前空間}
+%\author{%
+% The \LaTeX3 Project\thanks
+%   {%
+%     E-mail:
+%       \href{mailto:latex-team@latex-project.org}
+%         {latex-team@latex-project.org}%
+%   }%
+%}
+\author{%
+ \LaTeX3プロジェクト\thanks
+   {%
+     E-mail:
+       \href{mailto:latex-team@latex-project.org}
+         {latex-team@latex-project.org}%
+   }%
+}
+%\date{Released 2020-01-22}
+\date{バージョン 2020-01-22}
+
+\maketitle
+
+\begin{documentation}
+
+%\section{Setting up the \LaTeX3 programming language}
+\section{\LaTeX3プログラミング言語のセットアップ}
+
+%This module is at the core of the \LaTeX3 programming language. It
+%performs the following tasks:
+このモジュールは\LaTeX3プログラミング言語のコアにあたり，以下のタスクを
+実行します：
+%
+\begin{itemize}
+%  \item defines new names for all \TeX{} primitives;
+%  \item switches to the category code r{\'e}gime for programming;
+%  \item provides support settings for building the code as a \TeX{} format.
+  \item すべての\TeX プリミティブについて，新しい名前を定義
+  \item カテゴリーコード環境をプログラミング用に変更
+  \item コードを\TeX フォーマットとしてビルドするためのサポートを提供
+\end{itemize}
+
+%This module is entirely dedicated to primitives, which should not be
+%used directly within \LaTeX3 code (outside of \enquote{kernel-level}
+%code). As such, the primitives are not documented here: \emph{The
+%\TeX{}book}, \emph{\TeX{} by Topic} and the manuals for \pdfTeX{},
+%\XeTeX{}, \LuaTeX{}, \pTeX{} and \upTeX{} should be consulted for
+%details of the primitives. These are named
+%\cs[no-index]{tex_\meta{name}:D}, typically based on the primitive's
+%\meta{name} in \pdfTeX{} and omitting a leading |pdf| when the
+%primitive is not related to pdf output.
+このモジュールは\TeX プリミティブを扱うためのものです．プリミティブは
+（「カーネルレベル」のコードを除き）\LaTeX3コードの中では直接使用する
+べきではありません．そのため\TeX のプリミティブについてはここでは解説
+しません．そうした解説については『\TeX ブック』や『{\TeX} by Topic』，
+あるいは\pdfTeX, \XeTeX, \LuaTeX, \pTeX, \upTeX のマニュアルを参照して
+ください．\LaTeX3において各\TeX プリミティブは，典型的にはその名前
+\meta{name}に基づいて\cs[no-index]{tex_\meta{name}:D}という形で与えられ
+ます．ただし\pdfTeX のプリミティブについては，プレフィックスの|pdf|は
+機能的にPDF出力と関係がない限り省略されます．
+
+\end{documentation}
+
+\end{document}
