@@ -1,0 +1,1436 @@
+% +++
+% sequence = ["latex", "dvipdf"]
+% latex = "uplatex"
+% clean_files = [
+%   "%B.aux", "%B.dvi", "%B.glo", "%B.hd", "%B.idx", "%B.ind",
+%   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
+% ]
+% +++
+\documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
+\RequirePackage{interface3-ja}
+
+\begin{document}
+
+%\title{The \pkg{l3basics} package\\ Basic definitions}
+\title{\pkg{l3basics}パッケージ\\ 基本的な定義}
+%\author{%
+% The \LaTeX3 Project\thanks
+%   {%
+%     E-mail:
+%       \href{mailto:latex-team@latex-project.org}
+%         {latex-team@latex-project.org}%
+%   }%
+%}
+\author{%
+ \LaTeX3プロジェクト\thanks
+   {%
+     E-mail:
+       \href{mailto:latex-team@latex-project.org}
+         {latex-team@latex-project.org}%
+   }%
+}
+%\date{Released 2020-01-22}
+\date{バージョン 2020-01-22}
+
+\maketitle
+
+\begin{documentation}
+
+%As the name suggest this package holds some basic definitions which
+%are needed by most or all other packages in this set.
+名前が示すとおり，このモジュールは\pkg{expl3}に含まれるほとんどの
+パッケージが必要とするいくつかの基本的な定義を行うものです．
+
+%Here we describe those functions that are used all over the place. With
+%that we mean functions dealing with the construction and testing of
+%control sequences. Furthermore the basic parts of conditional
+%processing are covered; conditional processing dealing with specific
+%data types is described in the modules specific for the respective
+%data types.
+ここで\pkg{expl3}全体で用いられるそれらの基本的な関数を説明します．
+具体的には，制御綴の作成やテストに関わる関数です．加えて，このモジュール
+は基本的な条件分岐の機能提供も行います．ただし特定のデータ型に固有の
+条件分岐については，ここではなくそれぞれのデータ型を扱うモジュールに
+おいて説明されます．
+
+%\section{No operation functions}
+\section{ノーオペレーション関数}
+
+\begin{function}[EXP]{\prg_do_nothing:}
+  \begin{syntax}
+    \cs{prg_do_nothing:}
+  \end{syntax}
+%  An expandable function which does nothing at all: leaves nothing
+%  in the input stream after a single expansion.
+  完全に何もしない，展開可能な関数です．1回展開すると空文字列になり，
+  入力ストリームには何も残しません．
+\end{function}
+
+\begin{function}{\scan_stop:}
+  \begin{syntax}
+    \cs{scan_stop:}
+  \end{syntax}
+%  A non-expandable function which does nothing. Does not vanish on
+%  expansion but produces no typeset output.
+  何もしない展開不能な関数です．展開操作で消えることはありませんが，
+  組版結果には何も作用しません．
+\end{function}
+
+%\section{Grouping material}
+\section{グループ}
+
+\begin{function}{\group_begin:, \group_end:}
+  \begin{syntax}
+    \cs{group_begin:}
+    \cs{group_end:}
+  \end{syntax}
+%  These functions begin and end a group for definition purposes.
+%  Assignments are local to groups unless carried out in a global
+%  manner. (A small number of exceptions to this rule will be noted
+%  as necessary elsewhere in this document.) Each \cs{group_begin:}
+%  must be matched by a \cs{group_end:}, although this does not have
+%  to occur within the same function. Indeed, it is often necessary
+%  to start a group within one function and finish it within another,
+%  for example when seeking to use non-standard category codes.
+  これらの関数はそれぞれ定義のためのグループを開始・終了します．
+  代入操作はグローバル指定がないかぎりグループ内でローカルに行なわれ
+  ます（いくつか例外がありますが，それらは適宜説明します）．
+  \cs{group_begin:}で開始されたグループは必ず\cs{group_end:}で終了
+  される必要があります．ただし，これらは必ずしも同じ関数内で完結して
+  いなくても構いません．実際，しばしばある関数でグループを開始して，
+  別の関数でグループを終了しなければならないことがあります．例えば
+  非標準的なカテゴリーコードを適用したい場合などです．
+\end{function}
+
+\begin{function}{\group_insert_after:N}
+  \begin{syntax}
+    \cs{group_insert_after:N} \meta{token}
+  \end{syntax}
+%  Adds \meta{token} to the list of \meta{tokens} to be inserted
+%  when the current group level ends. The list of \meta{tokens} to be
+%  inserted is empty at the beginning of a group: multiple
+%  applications of \cs{group_insert_after:N} may be used to build
+%  the inserted list one \meta{token} at a time. The current group
+%  level may be closed by a \cs{group_end:} function or by a token
+%  with category code $2$ (close-group), namely a ^^A{
+%  |}| if standard category codes apply.
+  \meta{token}を現在の（最も内側の）グループの終了時に挿入される
+  トークンのリストに追加します．このトークンのリストはグループの開始
+  時点で空リストとなるように作成されます．\cs{group_insert_after:N}を
+  複数回使用した場合，リストに格納された各\meta{token}が一度に挿入
+  されることになります．現在のグループは\cs{group_end:}関数か，
+  カテゴリーコード$2$（グループ終了）のトークン（標準的なカテゴリー
+  コード設定下では|}|）によって終了させることができます．
+\end{function}
+
+%\section{Control sequences and functions}
+\section{制御綴と関数}
+
+%As \TeX{} is a macro language, creating new functions means
+%creating macros. At point of use, a function is replaced by
+%the replacement text (\enquote{code}) in which each parameter
+%in the code (|#1|, |#2|, \emph{etc.}) is replaced the appropriate
+%arguments absorbed by the function. In the following, \meta{code}
+%is therefore used as a shorthand for \enquote{replacement text}.
+\TeX はマクロ言語なので，関数を作ることはマクロを作ることを意味します．
+関数を使用すると，その関数は置換テキスト (\enquote{code}) に置き換えられ
+ます．このとき置換テキスト内の各パラメータ (|#1|, |#2|, \dots) はそれ
+ぞれ関数に与えられた適切な引数に置き換えられます．そのため以下では
+\meta{code}は「置換テキスト」のことを指しています．
+
+%Functions which are not \enquote{protected} are fully expanded
+%inside an \texttt{x} expansion. In contrast, \enquote{protected}
+%functions are not expanded within \texttt{x} expansions.
+「保護付き」の関数以外は\code{x}展開では完全展開可能です．一方で
+「保護付き」の関数は\code{x}展開においては展開されません．
+
+%\subsection{Defining functions}
+\subsection{関数定義}
+
+%Functions can be created with no requirement that they are declared
+%first (in contrast to variables, which must always be declared).
+%Declaring a function before setting up the code means that the name
+%chosen is checked and an error raised if it is already in use.
+%The name of a function can be checked at the point of definition using
+%the \cs[no-index]{cs_new\ldots} functions: this is recommended for all
+%functions which are defined for the first time.
+関数は（必ず事前に宣言を必要とする各種変数と異なり）事前に宣言すること
+なく作成することができます．関数定義をする前に関数を宣言するということ
+には選んだ関数名をチェックし，もし既に使用されている場合にはエラーを出す
+という効果があります．\cs[no-index]{cs_new*}系の関数を用いると定義の際に
+このチェックを行うことができます．任意の関数を最初に定義する際は，この
+方法を使用することが推奨されます．
+
+%There are three ways to define new functions.
+%All classes define a function to expand to the substitution text.
+%Within the substitution text the actual parameters are substituted
+%for the formal parameters (|#1|, |#2|, \ldots).
+関数を定義する方法は3種類（クラス）に大別できます．いずれの方法を用いて
+も，その関数は置換テキストに展開されるように定義されます．置換テキスト
+内のパラメータ (|#1|, |#2|, \dots) は実際の引数に置き換えられます．
+%
+\begin{description}[style=multiline, leftmargin=3zw]
+%  \item[\texttt{new}]
+%    Create a new function with the \texttt{new} scope,
+%    such as \cs{cs_new:Npn}.  The definition is global and results in
+%    an error if it is already defined.
+  \item[\code{new}]
+    新しい関数は\cs{cs_new:Npn}などの\code{new}系の関数で作成できます．
+    これらによる定義はグローバルで，既に定義済みの関数を作成しようと
+    するとエラーが発生します．
+%
+%  \item[\texttt{set}]
+%    Create a new function with the \texttt{set} scope,
+%    such as \cs{cs_set:Npn}. The definition is restricted to the current
+%    \TeX{} group and does not result in an error if the function is already
+%    defined.
+  \item[\code{set}]
+    新しい関数は\cs{cs_set:Npn}などの\code{set}系の関数でも作成できます．
+    これらによる定義は現在の（最も内側の）グループ内に限定され，既に
+    定義済みの関数であってもエラーは発生しません．
+%
+%  \item[\texttt{gset}]
+%    Create a new function with the \texttt{gset} scope,
+%    such as \cs{cs_gset:Npn}. The definition is global and
+%    does not result in an error if the function is already defined.
+  \item[\code{gset}]
+    新しい関数は\cs{cs_gset:Npn}などの\code{gset}系の関数でも作成できます．
+    これらによる定義はグローバルで，既に定義済みの関数であってもエラーは
+    発生しません．
+\end{description}
+
+%Within each set of scope there are different ways to define a function.
+%The differences depend on restrictions on the actual parameters and
+%the expandability of the resulting function.
+上記の各クラスの中でも，関数を定義する方法は多岐にわたります．関数には
+実引数や関数の展開可能性を柔軟に設定できます．
+%
+\begin{description}[style=multiline, leftmargin=6zw]
+%  \item[\texttt{nopar}]
+%     Create a new function with the \texttt{nopar} restriction,
+%     such as \cs{cs_set_nopar:Npn}. The parameter may not contain
+%     \cs{par} tokens.
+  \item[\code{nopar}]
+     \cs{cs_set_nopar:Npn}などで関数を作成すると\code{nopar}制限が付加
+     されます．実引数は\cs{par}トークンを含むことができなくなります．
+%
+%  \item[\texttt{protected}]
+%     Create a new function with the \texttt{protected} restriction,
+%     such as \cs{cs_set_protected:Npn}. The parameter may contain
+%     \cs{par} tokens but the function will not expand within an
+%     \texttt{x}-type or \texttt{e}-type expansion.
+  \item[\code{protected}]
+     \cs{cs_set_protected:Npn}などで関数を作成すると\code{nopar}制限が
+     付加されます．実引数は\cs{par}トークンを含むことができますが，
+     関数自体は\code{x}展開や\code{e}展開においては展開されなくなります．
+\end{description}
+
+%Finally, the functions in
+%Subsections~\ref{sec:l3basics:defining-new-function-1}~and
+%\ref{sec:l3basics:defining-new-function-2} are primarily meant to define
+%\emph{base functions} only. Base functions can only have the following
+%argument specifiers:
+以下\ref{sec:l3basics:defining-new-function-1}節と\ref{sec:l3basics:%
+defining-new-function-2}節で説明する関数は\emph{基本関数}のみを定義する
+ことが意図されています．基本関数がもち得る引数指定子は以下のもののみです：
+%
+\begin{description}[style=multiline, leftmargin=3zw]
+%  \item[|N| and |n|] No manipulation.
+%  \item[|T| and |F|] Functionally equivalent to |n| (you are actually
+%    encouraged to use the family of |\prg_new_conditional:| functions
+%    described in Section~\ref{sec:l3prg:new-conditional-functions}).
+%  \item[|p| and |w|] These are special cases.
+  \item[\code{N}/\code{n}] 操作なし
+  \item[\code{T}/\code{F}] 機能的には\code{n}と同様（実践ではここに挙げる
+    関数よりも\ref{sec:l3prg:new-conditional-functions}節で説明する
+    |\prg_new_conditional:*|系の関数の利用が推奨されます）
+  \item[\code{p}/\code{w}] 一部特殊なものもあります
+\end{description}
+
+%The |\cs_new:| functions below (and friends) do not stop you from using
+%other argument specifiers in your function names, but they do not handle
+%expansion for you. You should define the base function and then use
+%\cs{cs_generate_variant:Nn} to generate custom variants as described in
+%Section~\ref{sec:l3expan:variants-method}.
+以下の|\cs_new:*|系の関数（およびその仲間）を用いて上記以外の引数指定子
+をもつ関数を定義することもできますが，展開制御が自動的に行なわれることは
+ありません．まずは基本関数を定義して，その上で\cs{cs_generate_variant:Nn}%
+を用いて独自の変種を生成するのがよいでしょう
+（\ref{sec:l3expan:variants-method}節を参照）．
+
+%\subsection{Defining new functions using parameter text}
+\subsection{パラメータテキストを用いた関数定義}
+\label{sec:l3basics:defining-new-function-1}
+
+\begin{function}{\cs_new:Npn, \cs_new:cpn, \cs_new:Npx, \cs_new:cpx}
+  \begin{syntax}
+    \cs{cs_new:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+%  Creates \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The definition is global and an error results if the
+%  \meta{function} is already defined.
+  \meta{code}を置換テキストとする関数\meta{function}を作成します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．この定義はグローバルで，\meta{function}が
+  定義済みの場合はエラーが発生します．
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_nopar:Npn, \cs_new_nopar:cpn,
+    \cs_new_nopar:Npx, \cs_new_nopar:cpx
+  }
+  \begin{syntax}
+    \cs{cs_new_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+%  Creates \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The definition is global and
+%  an error results if the \meta{function} is already defined.
+  \meta{code}を置換テキストとする関数\meta{function}を作成します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．この定義はグローバルで，
+  \meta{function}が定義済みの場合はエラーが発生します．
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_protected:Npn, \cs_new_protected:cpn,
+    \cs_new_protected:Npx, \cs_new_protected:cpx
+  }
+  \begin{syntax}
+    \cs{cs_new_protected:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+%  Creates \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The \meta{function} will not expand within an \texttt{x}-type
+%  argument. The definition is global and an error results if the
+%  \meta{function} is already defined.
+  \meta{code}を置換テキストとする関数\meta{function}を作成します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．定義された\meta{function}は\code{x}展開および
+  \code{e}展開では展開されません．この定義はグローバルで，\meta{function}が
+  定義済みの場合はエラーが発生します．
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_protected_nopar:Npn, \cs_new_protected_nopar:cpn ,
+    \cs_new_protected_nopar:Npx, \cs_new_protected_nopar:cpx
+  }
+  \begin{syntax}
+    \cs{cs_new_protected_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+%  Creates \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The \meta{function} will not
+%  expand within an \texttt{x}-type or \texttt{e}-type argument. The definition is global
+%  and an error results if the \meta{function} is already defined.
+  \meta{code}を置換テキストとする関数\meta{function}を作成します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．定義された\meta{function}は
+  \code{x}展開および\code{e}展開では展開されません．この定義はグローバル
+  で，\meta{function}が定義済みの場合はエラーが発生します．
+\end{function}
+
+\begin{function}{\cs_set:Npn, \cs_set:cpn, \cs_set:Npx, \cs_set:cpx}
+  \begin{syntax}
+    \cs{cs_set:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+%  Sets \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The assignment of a meaning to the \meta{function} is restricted to
+%  the current \TeX{} group level.
+  関数\meta{function}を\meta{code}に展開されるように設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．この\meta{function}の意味の設定は，現在の
+  最も内側の\TeX グループ内でのみ有効です．
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_nopar:Npn, \cs_set_nopar:cpn,
+    \cs_set_nopar:Npx, \cs_set_nopar:cpx
+  }
+  \begin{syntax}
+    \cs{cs_set_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  When the \meta{function} is used the \meta{parameters} absorbed
+  cannot contain \cs{par} tokens. The assignment of a meaning
+  to the \meta{function} is restricted to the current \TeX{} group
+  level.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_protected:Npn, \cs_set_protected:cpn,
+    \cs_set_protected:Npx, \cs_set_protected:cpx
+  }
+  \begin{syntax}
+    \cs{cs_set_protected:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  The assignment of a meaning to the \meta{function} is restricted to
+  the current \TeX{} group level. The \meta{function} will
+  not expand within an \texttt{x}-type or \texttt{e}-type argument.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_protected_nopar:Npn, \cs_set_protected_nopar:cpn ,
+    \cs_set_protected_nopar:Npx, \cs_set_protected_nopar:cpx ,
+  }
+  \begin{syntax}
+    \cs{cs_set_protected_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  When the \meta{function} is used the \meta{parameters} absorbed
+  cannot contain \cs{par} tokens. The assignment of a meaning
+  to the \meta{function} is restricted to the current \TeX{} group
+  level. The \meta{function} will not expand within an
+  \texttt{x}-type or \texttt{e}-type argument.
+\end{function}
+
+\begin{function}{\cs_gset:Npn, \cs_gset:cpn, \cs_gset:Npx, \cs_gset:cpx}
+  \begin{syntax}
+    \cs{cs_gset:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Globally sets \meta{function} to expand to \meta{code} as replacement
+  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  The assignment of a meaning to the \meta{function} is \emph{not}
+  restricted to the current \TeX{} group level: the assignment is
+  global.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_nopar:Npn, \cs_gset_nopar:cpn,
+    \cs_gset_nopar:Npx, \cs_gset_nopar:cpx
+  }
+  \begin{syntax}
+    \cs{cs_gset_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Globally sets \meta{function} to expand to \meta{code} as replacement
+  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  When the \meta{function} is used the \meta{parameters} absorbed
+  cannot contain \cs{par} tokens. The assignment of a meaning to the
+  \meta{function} is \emph{not} restricted to the current \TeX{}
+  group level: the assignment is global.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_protected:Npn, \cs_gset_protected:cpn,
+    \cs_gset_protected:Npx, \cs_gset_protected:cpx
+  }
+  \begin{syntax}
+    \cs{cs_gset_protected:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Globally sets \meta{function} to expand to \meta{code} as replacement
+  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  The assignment of a meaning to the \meta{function} is \emph{not}
+  restricted to the current \TeX{} group level: the assignment is
+  global. The \meta{function} will not expand within an
+  \texttt{x}-type or \texttt{e}-type argument.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_protected_nopar:Npn, \cs_gset_protected_nopar:cpn,
+    \cs_gset_protected_nopar:Npx, \cs_gset_protected_nopar:cpx
+  }
+  \begin{syntax}
+    \cs{cs_gset_protected_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
+  \end{syntax}
+  Globally sets \meta{function} to expand to \meta{code} as replacement
+  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+  \emph{etc.}) will be replaced by those absorbed by the function.
+  When the \meta{function} is used the \meta{parameters} absorbed
+  cannot contain \cs{par} tokens. The assignment of a meaning to the
+  \meta{function} is \emph{not} restricted to the current \TeX{}
+  group level: the assignment is global. The \meta{function} will
+  not expand within an \texttt{x}-type argument.
+\end{function}
+
+\subsection{Defining new functions using the signature}
+\label{sec:l3basics:defining-new-function-2}
+
+\begin{function}
+  {
+    \cs_new:Nn, \cs_new:cn,
+    \cs_new:Nx, \cs_new:cx
+  }
+  \begin{syntax}
+    \cs{cs_new:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Creates \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function. The definition is global and
+  an error results if the \meta{function} is already defined.
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_nopar:Nn, \cs_new_nopar:cn,
+    \cs_new_nopar:Nx, \cs_new_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_new_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Creates \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens. The definition is global and
+  an error results if the \meta{function} is already defined.
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_protected:Nn, \cs_new_protected:cn,
+    \cs_new_protected:Nx, \cs_new_protected:cx
+  }
+  \begin{syntax}
+    \cs{cs_new_protected:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Creates \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function. The \meta{function} will not expand within an \texttt{x}-type
+  argument. The definition is global and
+  an error results if the \meta{function} is already defined.
+\end{function}
+
+\begin{function}
+  {
+    \cs_new_protected_nopar:Nn, \cs_new_protected_nopar:cn,
+    \cs_new_protected_nopar:Nx, \cs_new_protected_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_new_protected_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Creates \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens. The \meta{function} will not
+  expand within an \texttt{x}-type or \texttt{e}-type argument. The definition is global and
+  an error results if the \meta{function} is already defined.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set:Nn, \cs_set:cn,
+    \cs_set:Nx, \cs_set:cx
+  }
+  \begin{syntax}
+    \cs{cs_set:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.
+  The assignment of a meaning to the \meta{function} is restricted to
+  the current \TeX{} group level.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_nopar:Nn, \cs_set_nopar:cn,
+    \cs_set_nopar:Nx, \cs_set_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_set_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens.
+  The assignment of a meaning to the \meta{function} is restricted to
+  the current \TeX{} group level.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_protected:Nn, \cs_set_protected:cn,
+    \cs_set_protected:Nx, \cs_set_protected:cx
+  }
+  \begin{syntax}
+    \cs{cs_set_protected:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function. The \meta{function} will not expand within an \texttt{x}-type
+  argument.
+  The assignment of a meaning to the \meta{function} is restricted to
+  the current \TeX{} group level.
+\end{function}
+
+\begin{function}
+  {
+    \cs_set_protected_nopar:Nn, \cs_set_protected_nopar:cn,
+    \cs_set_protected_nopar:Nx, \cs_set_protected_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_set_protected_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens. The \meta{function} will not
+  expand within an \texttt{x}-type or \texttt{e}-type argument.
+  The assignment of a meaning to the \meta{function} is restricted to
+  the current \TeX{} group level.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset:Nn, \cs_gset:cn,
+    \cs_gset:Nx, \cs_gset:cx
+  }
+  \begin{syntax}
+    \cs{cs_gset:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.
+  The assignment of a meaning to the \meta{function} is  global.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_nopar:Nn, \cs_gset_nopar:cn,
+    \cs_gset_nopar:Nx, \cs_gset_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_gset_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens.
+  The assignment of a meaning to the \meta{function} is global.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_protected:Nn, \cs_gset_protected:cn,
+    \cs_gset_protected:Nx, \cs_gset_protected:cx
+  }
+  \begin{syntax}
+    \cs{cs_gset_protected:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function. The \meta{function} will not expand within an \texttt{x}-type
+  argument.
+  The assignment of a meaning to the \meta{function} is  global.
+\end{function}
+
+\begin{function}
+  {
+    \cs_gset_protected_nopar:Nn, \cs_gset_protected_nopar:cn,
+    \cs_gset_protected_nopar:Nx, \cs_gset_protected_nopar:cx
+  }
+  \begin{syntax}
+    \cs{cs_gset_protected_nopar:Nn} \meta{function} \Arg{code}
+  \end{syntax}
+  Sets \meta{function} to expand to \meta{code} as replacement text.
+  Within the \meta{code}, the number of \meta{parameters} is detected
+  automatically from the function signature. These \meta{parameters}
+  (|#1|, |#2|, \emph{etc.}) will be replaced by those absorbed by the
+  function.  When the \meta{function} is used the \meta{parameters}
+  absorbed cannot contain \cs{par} tokens. The \meta{function} will not
+  expand within an \texttt{x}-type or \texttt{e}-type argument.
+  The assignment of a meaning to the \meta{function} is global.
+\end{function}
+
+\begin{function}[updated = 2012-01-14]
+  {
+    \cs_generate_from_arg_count:NNnn,
+    \cs_generate_from_arg_count:cNnn,
+    \cs_generate_from_arg_count:Ncnn
+  }
+  \begin{syntax}
+    \cs{cs_generate_from_arg_count:NNnn} \meta{function} \meta{creator} \Arg{number} \Arg{code}
+  \end{syntax}
+  Uses the \meta{creator} function (which should have signature
+  |Npn|, for example \cs{cs_new:Npn}) to define a \meta{function}
+  which takes \meta{number} arguments and has \meta{code} as
+  replacement text. The \meta{number} of arguments is an integer expression,
+  evaluated as detailed for \cs{int_eval:n}.
+\end{function}
+
+\subsection{Copying control sequences}
+
+Control sequences (not just functions as defined above) can
+be set to have the same meaning using the functions described
+here. Making two control sequences equivalent means that the
+second control sequence is a \emph{copy} of the first (rather than
+a pointer to it). Thus the old and new control sequence are not
+tied together: changes to one are not reflected in the other.
+
+In the following text \enquote{cs} is used as an abbreviation for
+\enquote{control sequence}.
+
+\begin{function}
+  {\cs_new_eq:NN, \cs_new_eq:Nc, \cs_new_eq:cN, \cs_new_eq:cc}
+  \begin{syntax}
+    \cs{cs_new_eq:NN} \meta{cs_1} \meta{cs_2}
+    \cs{cs_new_eq:NN} \meta{cs_1} \meta{token}
+  \end{syntax}
+  Globally creates \meta{control sequence_1} and sets it to have the same
+  meaning as \meta{control sequence_2} or <token>.
+  The second control sequence may
+  subsequently be altered without affecting the copy.
+\end{function}
+
+\begin{function}
+  {\cs_set_eq:NN, \cs_set_eq:Nc, \cs_set_eq:cN, \cs_set_eq:cc}
+  \begin{syntax}
+    \cs{cs_set_eq:NN} \meta{cs_1} \meta{cs_2}
+    \cs{cs_set_eq:NN} \meta{cs_1} \meta{token}
+  \end{syntax}
+  Sets \meta{control sequence_1} to have the same meaning as
+  \meta{control sequence_2} (or <token>).
+  The second control sequence may subsequently be
+  altered without affecting the copy. The assignment of a meaning
+  to the \meta{control sequence_1} is restricted to the current
+  \TeX{} group level.
+\end{function}
+
+\begin{function}
+  {\cs_gset_eq:NN, \cs_gset_eq:Nc, \cs_gset_eq:cN, \cs_gset_eq:cc}
+  \begin{syntax}
+    \cs{cs_gset_eq:NN} \meta{cs_1} \meta{cs_2}
+    \cs{cs_gset_eq:NN} \meta{cs_1} \meta{token}
+  \end{syntax}
+  Globally sets \meta{control sequence_1} to have the same meaning as
+  \meta{control sequence_2} (or <token>).
+  The second control sequence may subsequently be
+  altered without affecting the copy. The assignment of a meaning to
+  the \meta{control sequence_1} is \emph{not} restricted to the current
+  \TeX{} group level: the assignment is global.
+\end{function}
+
+\subsection{Deleting control sequences}
+
+There are occasions where control sequences need to be deleted.
+This is handled in a very simple manner.
+
+\begin{function}[updated = 2011-09-15]{\cs_undefine:N, \cs_undefine:c}
+  \begin{syntax}
+    \cs{cs_undefine:N} \meta{control sequence}
+  \end{syntax}
+  Sets \meta{control sequence} to be globally undefined.
+\end{function}
+
+\subsection{Showing control sequences}
+
+\begin{function}[EXP, updated = 2011-12-22]{\cs_meaning:N, \cs_meaning:c}
+  \begin{syntax}
+    \cs{cs_meaning:N} \meta{control sequence}
+  \end{syntax}
+  This function expands to the \emph{meaning} of the \meta{control sequence}
+  control sequence. For a macro, this includes the \meta{replacement text}.
+  \begin{texnote}
+    This is \TeX{}'s \tn{meaning} primitive.
+    For tokens that are not control sequences, it is more logical to
+    use \cs{token_to_meaning:N}.
+    The \texttt{c} variant correctly reports undefined arguments.
+  \end{texnote}
+\end{function}
+
+\begin{function}[updated = 2017-02-14]{\cs_show:N, \cs_show:c}
+  \begin{syntax}
+    \cs{cs_show:N} \meta{control sequence}
+  \end{syntax}
+  Displays the definition of the \meta{control sequence} on the
+  terminal.
+  \begin{texnote}
+    This is similar to the \TeX{} primitive \tn{show}, wrapped to a
+    fixed number of characters per line.
+  \end{texnote}
+\end{function}
+
+\begin{function}[added = 2014-08-22, updated = 2017-02-14]{\cs_log:N, \cs_log:c}
+  \begin{syntax}
+    \cs{cs_log:N} \meta{control sequence}
+  \end{syntax}
+  Writes the definition of the \meta{control sequence} in the log
+  file.  See also \cs{cs_show:N} which displays the result in the
+  terminal.
+\end{function}
+
+\subsection{Converting to and from control sequences}
+
+\begin{function}[EXP]{\use:c}
+  \begin{syntax}
+    \cs{use:c} \Arg{control sequence name}
+  \end{syntax}
+  Expands the \meta{control sequence name} until only characters
+  remain, and then converts this into a control sequence. This process
+  requires two expansions.  As in other \texttt{c}-type arguments the
+  \meta{control sequence name} must, when fully expanded, consist of
+  character tokens, typically a mixture of category code $10$ (space),
+  $11$ (letter) and $12$ (other).
+  \begin{texnote}
+    Protected macros that appear in a \texttt{c}-type argument are
+    expanded despite being protected; \cs{exp_not:n} also has no
+    effect.  An internal error occurs if non-characters or active
+    characters remain after full expansion, as the conversion to a
+    control sequence is not possible.
+  \end{texnote}
+\end{function}
+
+As an example of the \cs{use:c} function, both
+  \begin{verbatim}
+    \use:c { a b c }
+  \end{verbatim}
+  and
+  \begin{verbatim}
+    \tl_new:N  \l_my_tl
+    \tl_set:Nn \l_my_tl { a b c }
+    \use:c { \tl_use:N \l_my_tl }
+  \end{verbatim}
+  would be equivalent to
+  \begin{verbatim}
+    \abc
+  \end{verbatim}
+  after two expansions of \cs{use:c}.
+
+\begin{function}[noTF, EXP, added = 2012-11-10]
+  {\cs_if_exist_use:N, \cs_if_exist_use:c}
+  \begin{syntax}
+    \cs{cs_if_exist_use:N} \meta{control sequence}
+    \cs{cs_if_exist_use:NTF} \meta{control sequence} \Arg{true code} \Arg{false code}
+  \end{syntax}
+  Tests whether the \meta{control sequence} is currently defined
+  according to the conditional \cs{cs_if_exist:NTF}
+  (whether as a function or another control sequence type), and if it
+  is inserts the  \meta{control sequence} into the input stream followed
+  by the \meta{true code}.  Otherwise the \meta{false code} is used.
+\end{function}
+
+\begin{function}[EXP]{\cs:w, \cs_end:}
+  \begin{syntax}
+    \cs{cs:w} \meta{control sequence name} \cs{cs_end:}
+  \end{syntax}
+  Converts the given \meta{control sequence name} into a single
+  control sequence token. This process requires one expansion.
+  The content for \meta{control sequence name} may be literal
+  material or from other expandable functions. The
+  \meta{control sequence name} must, when fully expanded, consist
+  of character tokens which are not active: typically
+  of category code $10$ (space), $11$ (letter)
+  or $12$ (other), or a mixture of these.
+  \begin{texnote}
+    These are the \TeX{} primitives \tn{csname} and \tn{endcsname}.
+  \end{texnote}
+\end{function}
+
+As an example of the \cs{cs:w} and \cs{cs_end:} functions, both
+  \begin{verbatim}
+    \cs:w a b c \cs_end:
+  \end{verbatim}
+  and
+  \begin{verbatim}
+    \tl_new:N  \l_my_tl
+    \tl_set:Nn \l_my_tl { a b c }
+    \cs:w \tl_use:N \l_my_tl \cs_end:
+  \end{verbatim}
+  would be equivalent to
+  \begin{verbatim}
+    \abc
+  \end{verbatim}
+  after one expansion of \cs{cs:w}.
+
+\begin{function}[EXP]{\cs_to_str:N}
+  \begin{syntax}
+    \cs{cs_to_str:N} \meta{control sequence}
+  \end{syntax}
+  Converts the given \meta{control sequence} into a series of
+  characters with category code $12$ (other), except spaces,
+  of category code $10$. The result does \emph{not} include
+  the current escape token, contrarily to \cs{token_to_str:N}.
+  Full expansion of this function requires exactly $2$ expansion
+  steps, and so an \texttt{x}-type or \texttt{e}-type expansion, or two
+  \texttt{o}-type expansions are required to
+  convert the \meta{control sequence} to a sequence of characters
+  in the input stream. In most cases, an \texttt{f}-expansion
+  is correct as well, but this loses a space at the start
+  of the result.
+\end{function}
+
+\section{Analysing control sequences}
+
+\begin{function}[EXP, added = 2018-04-06]{\cs_split_function:N}
+  \begin{syntax}
+    \cs{cs_split_function:N} \meta{function}
+  \end{syntax}
+  Splits the \meta{function} into the \meta{name} (\emph{i.e.}~the part
+  before the colon) and the \meta{signature} (\emph{i.e.}~after the colon).
+  This information is then placed in the input stream
+  in three parts: the \meta{name}, the
+  \meta{signature} and a logic token indicating if a colon was found
+  (to differentiate variables from function names). The \meta{name}
+  does not include the escape character, and both the \meta{name} and
+  \meta{signature} are made up of tokens with category code $12$
+  (other).
+\end{function}
+
+The next three functions decompose \TeX{} macros into their
+constituent parts: if the \meta{token} passed is not a macro then no
+decomposition can occur. In the latter case, all three functions leave
+\cs{scan_stop:} in the input stream.
+
+\begin{function}[EXP, added = 2019-02-27]{\cs_prefix_spec:N}
+  \begin{syntax}
+    \cs{cs_prefix_spec:N} \meta{token}
+  \end{syntax}
+  If the \meta{token} is a macro, this function leaves the applicable
+  \TeX{} prefixes in input stream as a string of tokens of category
+  code $12$ (with spaces having category code $10$). Thus for example
+  \begin{verbatim}
+    \cs_set:Npn \next:nn #1#2 { x #1~y #2 }
+    \cs_prefix_spec:N \next:nn
+  \end{verbatim}
+  leaves |\long| in the input stream. If the \meta{token} is
+  not a macro then \cs{scan_stop:} is left in the input stream.
+  \begin{texnote}
+    The prefix can be empty, |\long|, |\protected| or
+    |\protected\long| with backslash replaced by the current escape
+    character.
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP, added = 2019-02-27]{\cs_argument_spec:N}
+  \begin{syntax}
+    \cs{cs_argument_spec:N} \meta{token}
+  \end{syntax}
+  If the \meta{token} is a macro, this function leaves the primitive
+  \TeX{} argument specification in input stream as a string of
+  character tokens of category code $12$ (with spaces having category
+  code $10$). Thus for example
+  \begin{verbatim}
+    \cs_set:Npn \next:nn #1#2 { x #1 y #2 }
+    \cs_argument_spec:N \next:nn
+  \end{verbatim}
+  leaves |#1#2| in the input stream. If the \meta{token} is
+  not a macro then \cs{scan_stop:} is left in the input stream.
+  \begin{texnote}
+    If the argument specification contains the string |->|, then the
+    function produces incorrect results.
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP, added = 2019-02-27]{\cs_replacement_spec:N}
+  \begin{syntax}
+    \cs{cs_replacement_spec:N} \meta{token}
+  \end{syntax}
+  If the \meta{token} is a macro, this function leaves the replacement
+  text in input stream as a string of character tokens of category
+  code $12$ (with spaces having category code $10$). Thus for example
+  \begin{verbatim}
+    \cs_set:Npn \next:nn #1#2 { x #1~y #2 }
+    \cs_replacement_spec:N \next:nn
+  \end{verbatim}
+  leaves \verb*|x#1 y#2| in the input stream. If the \meta{token} is
+  not a macro then \cs{scan_stop:} is left in the input stream.
+  \begin{texnote}
+    If the argument specification contains the string |->|, then the
+    function produces incorrect results.
+  \end{texnote}
+\end{function}
+
+\section{Using or removing tokens and arguments}
+
+Tokens in the input can be read and used or read and discarded.
+If one or more tokens are wrapped in braces then when absorbing them
+the outer set is removed. At the same time, the category code
+of each token is set when the token is read by a function (if it
+is read more than once, the category code is determined by
+the situation in force when first function absorbs the token).
+
+\begin{function}[EXP]{\use:n, \use:nn, \use:nnn, \use:nnnn}
+  \begin{syntax}
+    \cs{use:n}    \Arg{group_1}
+    \cs{use:nn}   \Arg{group_1} \Arg{group_2}
+    \cs{use:nnn}  \Arg{group_1} \Arg{group_2} \Arg{group_3}
+    \cs{use:nnnn} \Arg{group_1} \Arg{group_2} \Arg{group_3} \Arg{group_4}
+  \end{syntax}
+  As illustrated, these functions absorb between one and four
+  arguments, as indicated by the argument specifier. The braces
+  surrounding each argument are removed and the remaining tokens are
+  left in the input stream. The category code of these tokens is
+  also fixed by this process (if it has not already been by some
+  other absorption). All of these functions require only a single
+  expansion to operate, so that one expansion of
+  \begin{verbatim}
+    \use:nn { abc } { { def } }
+  \end{verbatim}
+  results in the input stream containing
+  \begin{verbatim}
+    abc { def }
+  \end{verbatim}
+  \emph{i.e.} only the outer braces are removed.
+  \begin{texnote}
+    The \cs{use:n} function is equivalent to \LaTeXe{}'s \tn{@firstofone}.
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP]{\use_i:nn, \use_ii:nn}
+   \begin{syntax}
+    \cs{use_i:nn} \Arg{arg_1} \Arg{arg_2}
+  \end{syntax}
+  These functions absorb two arguments from the input stream. The function
+  \cs{use_i:nn} discards the second argument, and leaves the content
+  of the first argument in the input stream. \cs{use_ii:nn} discards
+  the first argument and leaves the content of the second argument in
+  the input stream.
+  The category code
+  of these tokens is also fixed (if it has not already been by
+  some other absorption). A single expansion is needed for the
+  functions to take effect.
+\end{function}
+
+\begin{texnote}
+  These are equivalent to \LaTeXe{}'s \tn{@firstoftwo} and
+  \tn{@secondoftwo}.
+\end{texnote}
+
+\begin{function}[EXP]{\use_i:nnn, \use_ii:nnn, \use_iii:nnn}
+  \begin{syntax}
+    \cs{use_i:nnn} \Arg{arg_1} \Arg{arg_2} \Arg{arg_3}
+  \end{syntax}
+  These functions absorb three arguments from the input stream. The
+  function \cs{use_i:nnn} discards the second and third arguments, and
+  leaves the content of the first argument in the input stream.
+  \cs{use_ii:nnn} and \cs{use_iii:nnn} work similarly, leaving the
+  content of second or third arguments in the input stream, respectively.
+  The category code
+  of these tokens is also fixed (if it has not already been by
+  some other absorption). A single expansion is needed for the
+  functions to take effect.
+\end{function}
+
+\begin{function}[EXP]
+  {\use_i:nnnn, \use_ii:nnnn, \use_iii:nnnn, \use_iv:nnnn}
+  \begin{syntax}
+    \cs{use_i:nnnn} \Arg{arg_1} \Arg{arg_2} \Arg{arg_3} \Arg{arg_4}
+  \end{syntax}
+  These functions absorb four arguments from the input stream. The
+  function \cs{use_i:nnnn} discards the second, third and fourth
+  arguments, and leaves the content of the first argument in the input
+  stream.
+  \cs{use_ii:nnnn}, \cs{use_iii:nnnn} and \cs{use_iv:nnnn} work similarly,
+  leaving the content of second, third or fourth arguments in the input
+  stream, respectively. The category code
+  of these tokens is also fixed (if it has not already been by
+  some other absorption). A single expansion is needed for the
+  functions to take effect.
+\end{function}
+
+\begin{function}[EXP]{\use_i_ii:nnn}
+  \begin{syntax}
+    \cs{use_i_ii:nnn} \Arg{arg_1} \Arg{arg_2} \Arg{arg_3}
+  \end{syntax}
+  This function absorbs three arguments and leaves the content of the
+  first and second in the input stream. The category code of
+  these tokens is also fixed (if it has not already been by
+  some other absorption). A single expansion is needed for the
+  function to take effect. An example:
+  \begin{verbatim}
+    \use_i_ii:nnn { abc } { { def } } { ghi }
+  \end{verbatim}
+  results in the input stream containing
+  \begin{verbatim}
+    abc { def }
+  \end{verbatim}
+  \emph{i.e.} the outer braces are removed and the third group
+  is removed.
+\end{function}
+
+\begin{function}[EXP, added = 2019-06-02]{\use_ii_i:nn}
+  \begin{syntax}
+    \cs{use_ii_i:nn} \Arg{arg_1} \Arg{arg_2}
+  \end{syntax}
+  This function absorbs two arguments and leaves the content of the
+  second and first in the input stream. The category code of
+  these tokens is also fixed (if it has not already been by
+  some other absorption). A single expansion is needed for the
+  function to take effect.
+\end{function}
+
+\begin{function}[EXP]
+  {
+    \use_none:n         ,
+    \use_none:nn        ,
+    \use_none:nnn       ,
+    \use_none:nnnn      ,
+    \use_none:nnnnn     ,
+    \use_none:nnnnnn    ,
+    \use_none:nnnnnnn   ,
+    \use_none:nnnnnnnn  ,
+    \use_none:nnnnnnnnn
+  }
+  \begin{syntax}
+    \cs{use_none:n} \Arg{group_1}
+  \end{syntax}
+  These functions absorb between one and nine groups from the
+  input stream, leaving nothing on the resulting input stream.
+  These functions work after a single expansion. One or more of the
+  \texttt{n} arguments may be an unbraced single token
+  (\emph{i.e.}~an \texttt{N} argument).
+  \begin{texnote}
+    These are equivalent to \LaTeXe{}'s \tn{@gobble}, \tn{@gobbbletwo},
+    \emph{etc.}
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP, added = 2018-06-18]{\use:e}
+  \begin{syntax}
+    \cs{use:e} \Arg{expandable tokens}
+  \end{syntax}
+  Fully expands the \meta{token list} in an \texttt{x}-type manner,
+  \emph{but} the function remains fully expandable, and parameter
+  character (usually~|#|) need not be doubled.
+  \begin{texnote}
+    \cs{use:e} is a wrapper around the primitive \tn{expanded}
+    where it is available:
+    it requires two expansions to complete its action.
+    When \tn{expanded} is not available this function is very slow.
+  \end{texnote}
+\end{function}
+
+\begin{function}[updated = 2011-12-31]{\use:x}
+  \begin{syntax}
+    \cs{use:x} \Arg{expandable tokens}
+  \end{syntax}
+  Fully expands the \meta{expandable tokens} and inserts the
+  result into the input stream at the current location.
+  Any hash characters (|#|) in the argument must be doubled.
+\end{function}
+
+\subsection{Selecting tokens from delimited arguments}
+
+A different kind of function for selecting tokens from the token
+stream are those that use delimited arguments.
+
+\begin{function}[EXP]
+  {
+    \use_none_delimit_by_q_nil:w,
+    \use_none_delimit_by_q_stop:w,
+    \use_none_delimit_by_q_recursion_stop:w
+  }
+  \begin{syntax}
+   \cs{use_none_delimit_by_q_nil:w} \meta{balanced text} \cs{q_nil}
+   \cs{use_none_delimit_by_q_stop:w} \meta{balanced text} \cs{q_stop}
+   \cs{use_none_delimit_by_q_recursion_stop:w} \meta{balanced text} \cs{q_recursion_stop}
+  \end{syntax}
+  Absorb the \meta{balanced text} form the input stream delimited by
+  the marker given in the function name, leaving nothing in the
+  input stream.
+\end{function}
+
+\begin{function}[EXP]
+  {
+    \use_i_delimit_by_q_nil:nw,
+    \use_i_delimit_by_q_stop:nw,
+    \use_i_delimit_by_q_recursion_stop:nw
+  }
+  \begin{syntax}
+   \cs{use_i_delimit_by_q_nil:nw} \Arg{inserted tokens} \meta{balanced text} \cs{q_nil}
+   \cs{use_i_delimit_by_q_stop:nw} \Arg{inserted tokens} \meta{balanced text} \cs{q_stop}
+   \cs{use_i_delimit_by_q_recursion_stop:nw} \Arg{inserted tokens} \meta{balanced text} \cs{q_recursion_stop}
+  \end{syntax}
+  Absorb the \meta{balanced text} form the input stream delimited by
+  the marker given in the function name, leaving \meta{inserted tokens}
+  in the input stream for further processing.
+\end{function}
+
+\section{Predicates and conditionals}
+
+\LaTeX3 has three concepts for conditional flow processing:
+\begin{description}
+  \item[Branching conditionals]
+    Functions that carry out a test and then execute, depending on its
+    result, either the code supplied as the \meta{true code} or the
+    \meta{false code}.
+    These arguments are denoted with |T| and |F|, respectively. An
+    example would be
+    \begin{quote}
+     |\cs_if_free:cTF {abc}| \Arg{true code} \Arg{false code}
+    \end{quote}
+    a function that turns the first argument into a control sequence
+    (since it's marked as |c|) then checks whether this control sequence
+    is still free and then depending on the result carries out the code in
+    the second argument (true case) or in the third argument (false
+    case).
+
+    These type of functions are known as \enquote{conditionals};
+    whenever a |TF| function is defined it is usually accompanied by
+    |T| and |F| functions as well. These are provided for convenience when
+    the branch only needs to go a single way. Package writers are free to
+    choose which types to define but the kernel definitions always
+    provide all three versions.
+
+    Important to note is that these branching conditionals with \meta{true
+    code} and/or \meta{false code} are always defined in a way that the
+    code of the chosen alternative can operate on following tokens in
+    the input stream.
+
+    These conditional functions may or may not be fully expandable, but if
+    they are expandable they are accompanied by a \enquote{predicate}
+    for the same test as described below.
+
+  \item[Predicates]
+    \enquote{Predicates} are functions that return a special type of
+    boolean value which can be tested by the boolean expression parser.
+    All functions of this type
+    are expandable and have names that end with |_p| in the
+    description part.  For example,
+    \begin{quote}
+      \cs{cs_if_free_p:N}
+    \end{quote}
+    would be a predicate function for the same type of test as the
+    conditional described above. It would return \enquote{true} if its
+    argument (a single token denoted by |N|) is still free for definition.
+    It would be used in constructions like
+    \begin{quote}
+      |\bool_if:nTF {| \\
+      \verb"  \cs_if_free_p:N \l_tmpz_tl || \cs_if_free_p:N \g_tmpz_tl " \\
+      |}|
+      \Arg{true code} \Arg{false code}
+    \end{quote}
+
+    For each predicate defined, a \enquote{branching conditional}
+    also exists that behaves like a conditional described above.
+
+  \item[Primitive conditionals]
+     There is a third variety of conditional, which is the original
+     concept used in plain \TeX{} and \LaTeXe{}. Their use is discouraged
+     in \pkg{expl3} (although still used in low-level definitions)
+     because they are more fragile and in many cases require more
+     expansion control (hence more code) than the two types of
+     conditionals described above.
+\end{description}
+
+\begin{variable}{\c_true_bool, \c_false_bool}
+  Constants that represent |true| and |false|, respectively. Used to
+  implement predicates.
+\end{variable}
+
+\subsection{Tests on control sequences}
+
+\begin{function}[EXP,pTF]{\cs_if_eq:NN}
+  \begin{syntax}
+    \cs{cs_if_eq_p:NN} \meta{cs_1} \meta{cs_2}
+    \cs{cs_if_eq:NNTF} \meta{cs_1} \meta{cs_2} \Arg{true code} \Arg{false code}
+  \end{syntax}
+  Compares the definition of two \meta{control sequences} and
+  is logically \texttt{true} if they are the same, \emph{i.e.}~if they have exactly
+  the same definition when examined with \cs{cs_show:N}.
+\end{function}
+
+\begin{function}[EXP,pTF]{\cs_if_exist:N, \cs_if_exist:c}
+  \begin{syntax}
+    \cs{cs_if_exist_p:N} \meta{control sequence}
+    \cs{cs_if_exist:NTF} \meta{control sequence} \Arg{true code} \Arg{false code}
+  \end{syntax}
+  Tests whether the \meta{control sequence} is currently defined
+  (whether as a function or another control sequence type). Any
+  definition of \meta{control sequence} other than \tn{relax}
+  evaluates as \texttt{true}.
+\end{function}
+
+\begin{function}[EXP,pTF]{\cs_if_free:N, \cs_if_free:c}
+  \begin{syntax}
+    \cs{cs_if_free_p:N} \meta{control sequence}
+    \cs{cs_if_free:NTF} \meta{control sequence} \Arg{true code} \Arg{false code}
+  \end{syntax}
+  Tests whether the \meta{control sequence} is currently free to
+  be defined. This test is \texttt{false} if the
+  \meta{control sequence} currently exists (as defined by
+  \cs{cs_if_exist:N}).
+\end{function}
+
+\subsection{Primitive conditionals}
+
+The \eTeX{} engine itself provides many different conditionals. Some
+expand whatever comes after them and others don't. Hence the names
+for these underlying functions often contains a |:w| part but
+higher level functions are often available. See for instance
+\cs{int_compare_p:nNn} which is a wrapper for \cs{if_int_compare:w}.
+
+Certain conditionals deal with specific data types like boxes and
+fonts and are described there. The ones described below are either
+the universal conditionals or deal with control sequences. We
+prefix primitive conditionals with |\if_|.
+
+\begin{function}[EXP]
+  {\if_true:, \if_false:, \else:, \fi:, \reverse_if:N}
+  \begin{syntax}
+    "\if_true:" <true code> "\else:" <false code> "\fi:" \\
+    "\if_false:" <true code> "\else:" <false code> "\fi:" \\
+    "\reverse_if:N" <primitive conditional>
+  \end{syntax}
+  "\if_true:" always executes <true code>, while "\if_false:" always
+  executes <false code>. "\reverse_if:N" reverses any two-way primitive
+  conditional. "\else:" and "\fi:" delimit the branches of the
+  conditional. The function "\or:" is documented in \pkg{l3int} and
+  used in case switches.
+  \begin{texnote}
+    These are equivalent to their corresponding \TeX\ primitive
+    conditionals; \cs{reverse_if:N} is \eTeX's \tn{unless}.
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP]{\if_meaning:w}
+  \begin{syntax}
+    "\if_meaning:w" <arg_1> <arg_2> <true code> "\else:" <false code> "\fi:"
+  \end{syntax}
+  "\if_meaning:w" executes <true code> when <arg_1> and <arg_2> are the same,
+  otherwise it executes <false code>.
+  <arg_1> and <arg_2> could be functions, variables, tokens; in all cases the
+  \emph{unexpanded} definitions are compared.
+  \begin{texnote}
+    This is \TeX{}'s \tn{ifx}.
+  \end{texnote}
+\end{function}
+
+\begin{function}[EXP]{\if:w, \if_charcode:w, \if_catcode:w}
+  \begin{syntax}
+    "\if:w" <token_1> <token_2> <true code> "\else:" <false code> "\fi:" \\
+    "\if_catcode:w" <token_1> <token_2> <true code> "\else:" <false code> "\fi:"
+  \end{syntax}
+  These conditionals expand any following tokens until two
+  unexpandable tokens are left. If you wish to prevent this expansion,
+  prefix the token in question with "\exp_not:N". "\if_catcode:w"
+  tests if the category codes of the two tokens are the same whereas
+  "\if:w" tests if the character codes are
+  identical. "\if_charcode:w" is an alternative name for "\if:w".
+\end{function}
+
+\begin{function}[EXP]{\if_cs_exist:N, \if_cs_exist:w}
+  \begin{syntax}
+    "\if_cs_exist:N" <cs> <true code> "\else:" <false code> "\fi:" \\
+    "\if_cs_exist:w" <tokens> "\cs_end:" <true code> "\else:" <false code> "\fi:"
+  \end{syntax}
+  Check if <cs> appears in the hash table or if the control sequence
+  that can be formed from <tokens> appears in the hash table. The
+  latter function does not turn the control sequence in question into
+  "\scan_stop:"! This can be useful when dealing with control
+  sequences which cannot be entered as a single token.
+\end{function}
+
+\begin{function}[EXP]
+  {
+    \if_mode_horizontal:, \if_mode_vertical:,
+    \if_mode_math:, \if_mode_inner:
+  }
+  \begin{syntax}
+    "\if_mode_horizontal:" <true code> "\else:" <false code> "\fi:"
+  \end{syntax}
+  Execute <true code> if currently in horizontal mode, otherwise
+  execute <false code>. Similar for the other functions.
+\end{function}
+
+\section{Starting a paragraph}
+
+\begin{function}[added = 2017-07-04]{\mode_leave_vertical:}
+  \begin{syntax}
+    \cs{mode_leave_vertical:}
+  \end{syntax}
+  Ensures that \TeX{} is not in vertical (inter-paragraph) mode. In
+  horizontal or math mode this command has no effect, in vertical mode it
+  switches to horizontal mode, and inserts a box of width
+  \tn{parindent}, followed by the \tn{everypar} token list.
+  \begin{texnote}
+    This results in the contents of the \tn{everypar} token register being
+    inserted, after \cs{mode_leave_vertical:} is complete. Notice that in
+    contrast to the \LaTeXe{} \tn{leavevmode} approach, no box is used
+    by the method implemented here.
+  \end{texnote}
+\end{function}
+
+\subsection{Debugging support}
+
+\begin{function}[added = 2017-07-16, updated = 2017-08-02]{\debug_on:n, \debug_off:n}
+  \begin{syntax}
+    \cs{debug_on:n} |{| \meta{comma-separated list} |}|
+    \cs{debug_off:n} |{| \meta{comma-separated list} |}|
+  \end{syntax}
+  Turn on and off within a group various debugging code, some of which
+  is also available as \pkg{expl3} load-time options.  The items that
+  can be used in the \meta{list} are
+  \begin{itemize}
+    \item \texttt{check-declarations} that checks all \pkg{expl3}
+      variables used were previously declared and that local/global
+      variables (based on their name or on their first assignment) are
+      only locally/globally assigned;
+    \item \texttt{check-expressions} that checks integer, dimension,
+      skip, and muskip expressions are not terminated prematurely;
+    \item \texttt{deprecation} that makes soon-to-be-deprecated commands produce errors;
+    \item \texttt{log-functions} that logs function definitions;
+    \item \texttt{all} that does all of the above.
+  \end{itemize}
+  Providing these as switches rather than options allows testing code
+  even if it relies on other packages: load all other packages, call
+  \cs{debug_on:n}, and load the code that one is interested in
+  testing.  These functions can only be used in \LaTeXe{} package mode
+  loaded with \texttt{enable-debug} or another option implying it.
+\end{function}
+
+\begin{function}[added = 2017-11-28]{\debug_suspend:, \debug_resume:}
+  \begin{syntax}
+    \cs{debug_suspend:} \ldots{} \cs{debug_resume:}
+  \end{syntax}
+  Suppress (locally) errors and logging from \texttt{debug} commands,
+  except for the \texttt{deprecation} errors or warnings.  These pairs
+  of commands can be nested.  This can be used around pieces of code
+  that are known to fail checks, if such failures should be ignored.
+  See for instance \pkg{l3coffins}.
+\end{function}
+
+\end{documentation}
+
+\end{document}
