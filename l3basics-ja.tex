@@ -365,13 +365,18 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_set_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Sets \meta{function} to expand to \meta{code} as replacement text.
-  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  When the \meta{function} is used the \meta{parameters} absorbed
-  cannot contain \cs{par} tokens. The assignment of a meaning
-  to the \meta{function} is restricted to the current \TeX{} group
-  level.
+%  Sets \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The assignment of a meaning
+%  to the \meta{function} is restricted to the current \TeX{} group
+%  level.
+  関数\meta{function}を\meta{code}に展開されるように設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．この\meta{function}の意味
+  の設定は，現在の最も内側の\TeX グループ内でのみ有効です．
 \end{function}
 
 \begin{function}
@@ -382,12 +387,17 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_set_protected:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Sets \meta{function} to expand to \meta{code} as replacement text.
-  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  The assignment of a meaning to the \meta{function} is restricted to
-  the current \TeX{} group level. The \meta{function} will
-  not expand within an \texttt{x}-type or \texttt{e}-type argument.
+%  Sets \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The assignment of a meaning to the \meta{function} is restricted to
+%  the current \TeX{} group level. The \meta{function} will
+%  not expand within an \texttt{x}-type or \texttt{e}-type argument.
+  関数\meta{function}を\meta{code}に展開されるように設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．定義された\meta{function}は\code{x}展開
+  および\code{e}展開では展開されません．この\meta{function}の意味の
+  設定は，現在の最も内側の\TeX グループ内でのみ有効です．
 \end{function}
 
 \begin{function}
@@ -398,26 +408,37 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_set_protected_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Sets \meta{function} to expand to \meta{code} as replacement text.
-  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  When the \meta{function} is used the \meta{parameters} absorbed
-  cannot contain \cs{par} tokens. The assignment of a meaning
-  to the \meta{function} is restricted to the current \TeX{} group
-  level. The \meta{function} will not expand within an
-  \texttt{x}-type or \texttt{e}-type argument.
+%  Sets \meta{function} to expand to \meta{code} as replacement text.
+%  Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The assignment of a meaning
+%  to the \meta{function} is restricted to the current \TeX{} group
+%  level. The \meta{function} will not expand within an
+%  \texttt{x}-type or \texttt{e}-type argument.
+  関数\meta{function}を\meta{code}に展開されるように設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．定義された\meta{function}は
+  \code{x}展開および\code{e}展開では展開されません．この\meta{function}%
+  の意味の設定は，現在の最も内側の\TeX グループ内でのみ有効です．
 \end{function}
 
 \begin{function}{\cs_gset:Npn, \cs_gset:cpn, \cs_gset:Npx, \cs_gset:cpx}
   \begin{syntax}
     \cs{cs_gset:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Globally sets \meta{function} to expand to \meta{code} as replacement
-  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  The assignment of a meaning to the \meta{function} is \emph{not}
-  restricted to the current \TeX{} group level: the assignment is
-  global.
+%  Globally sets \meta{function} to expand to \meta{code} as replacement
+%  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The assignment of a meaning to the \meta{function} is \emph{not}
+%  restricted to the current \TeX{} group level: the assignment is
+%  global.
+  関数\meta{function}を\meta{code}に展開されるようグローバルに設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．この\meta{function}の意味の設定は，現在の
+  \TeX グループに\emph{制限されません}．すなわち，この設定はグローバル
+  です．
 \end{function}
 
 \begin{function}
@@ -428,13 +449,19 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_gset_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Globally sets \meta{function} to expand to \meta{code} as replacement
-  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  When the \meta{function} is used the \meta{parameters} absorbed
-  cannot contain \cs{par} tokens. The assignment of a meaning to the
-  \meta{function} is \emph{not} restricted to the current \TeX{}
-  group level: the assignment is global.
+%  Globally sets \meta{function} to expand to \meta{code} as replacement
+%  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The assignment of a meaning to the
+%  \meta{function} is \emph{not} restricted to the current \TeX{}
+%  group level: the assignment is global.
+  関数\meta{function}を\meta{code}に展開されるようグローバルに設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．この\meta{function}の意味の
+  設定は，現在の\TeX グループに\emph{制限されません}．すなわち，この設定
+  はグローバルです．
 \end{function}
 
 \begin{function}
@@ -445,13 +472,19 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_gset_protected:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Globally sets \meta{function} to expand to \meta{code} as replacement
-  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  The assignment of a meaning to the \meta{function} is \emph{not}
-  restricted to the current \TeX{} group level: the assignment is
-  global. The \meta{function} will not expand within an
-  \texttt{x}-type or \texttt{e}-type argument.
+%  Globally sets \meta{function} to expand to \meta{code} as replacement
+%  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  The assignment of a meaning to the \meta{function} is \emph{not}
+%  restricted to the current \TeX{} group level: the assignment is
+%  global. The \meta{function} will not expand within an
+%  \texttt{x}-type or \texttt{e}-type argument.
+  関数\meta{function}を\meta{code}に展開されるようグローバルに設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．この\meta{function}の意味の設定は，現在の
+  \TeX グループに\emph{制限されません}．すなわち，この設定はグローバル
+  です．定義された\meta{function}は\code{x}展開および\code{e}展開では
+  展開されません．
 \end{function}
 
 \begin{function}
@@ -462,14 +495,21 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   \begin{syntax}
     \cs{cs_gset_protected_nopar:Npn} \meta{function} \meta{parameters} \Arg{code}
   \end{syntax}
-  Globally sets \meta{function} to expand to \meta{code} as replacement
-  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
-  \emph{etc.}) will be replaced by those absorbed by the function.
-  When the \meta{function} is used the \meta{parameters} absorbed
-  cannot contain \cs{par} tokens. The assignment of a meaning to the
-  \meta{function} is \emph{not} restricted to the current \TeX{}
-  group level: the assignment is global. The \meta{function} will
-  not expand within an \texttt{x}-type argument.
+%  Globally sets \meta{function} to expand to \meta{code} as replacement
+%  text. Within the \meta{code}, the \meta{parameters} (|#1|, |#2|,
+%  \emph{etc.}) will be replaced by those absorbed by the function.
+%  When the \meta{function} is used the \meta{parameters} absorbed
+%  cannot contain \cs{par} tokens. The assignment of a meaning to the
+%  \meta{function} is \emph{not} restricted to the current \TeX{}
+%  group level: the assignment is global. The \meta{function} will
+%  not expand within an \texttt{x}-type argument.
+  関数\meta{function}を\meta{code}に展開されるようグローバルに設定します．
+  \meta{code}内では\meta{parameters} (|#1|, |#2|, \dots) はその関数に
+  渡された引数に置換されます．\meta{function}の使用時に渡される引数に
+  \cs{par}トークンを含めることはできません．この\meta{function}の意味の
+  設定は，現在の\TeX グループに\emph{制限されません}．すなわち，この設定は
+  グローバルです．定義された\meta{function}は\code{x}展開および\code{e}展開
+  では展開されません．
 \end{function}
 
 \subsection{Defining new functions using the signature}
