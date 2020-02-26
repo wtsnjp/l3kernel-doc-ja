@@ -6,11 +6,21 @@
 %   "%B.ilg", "%B.log", "%B.out", "%B.synctex.gz",
 % ]
 % +++
-\documentclass[dvipdfmx,full,kernel]{wtpl3doc}
+\documentclass[uplatex,dvipdfmx,full,kernel]{wtpl3doc}
+\usepackage{interface3-ja}
 
 \begin{document}
-\title{\pkg{l3int}パッケージ \\ 整数}
-%
+
+%\title{The \pkg{l3int} package\\ Integers}
+\title{\pkg{l3int}パッケージ\\ 整数}
+%\author{%
+% The \LaTeX3 Project\thanks
+%   {%
+%     E-mail:
+%       \href{mailto:latex-team@latex-project.org}
+%         {latex-team@latex-project.org}%
+%   }%
+%}
 \author{%
  \LaTeX3プロジェクト\thanks
    {%
@@ -19,13 +29,13 @@
          {latex-team@latex-project.org}%
    }%
 }
-%
+%\date{Released 2020-01-22}
 \date{バージョン 2020-01-22}
-%
+
 \maketitle
-%
+
 \begin{documentation}
-%
+
 %Calculation and comparison of integer values can be carried out
 %using literal numbers, \texttt{int} registers, constants and
 %integers stored in token list variables. The standard operators
@@ -39,10 +49,10 @@
 中で使用することができ，算術演算を可能にします．このモジュールは整数
 表現 (integer expressions, \enquote{\code{intexpr}}) のための関数を
 提供します．
-%
+
 %\section{Integer expressions}
 \section{整数表現}
-%
+
 \begin{function}[EXP]{\int_eval:n}
   \begin{syntax}
     \cs{int_eval:n} \Arg{integer expression}
@@ -88,7 +98,7 @@
     すなわち表現の冒頭や\code{+}, \code{-}, \code{*}, \code{/}, \code{(}%
     の直後に\code{+(}や\code{-(}を記述するとエラーが発生します．
   \end{itemize}
-%
+
 %  Each integer operand can be either an integer variable (with no need
 %  for \cs{int_use:N}) or an integer denotation.  For example both
   整数オペランドは整数変数（\cs{int_use:N}は必要ありません）または整数
@@ -130,7 +140,7 @@
     \cs{int_eval:n}の評価にはちょうど2回の展開が必要です．評価結果は
     \meta{internal integer}では\emph{ない}ため\TeX 言語スタイルの代入を
     行う場合には適当な終了点明示が必要となります．
-%
+
 %    As all \TeX{} integers, integer operands can also be dimension or
 %    skip variables, converted to integers in~\texttt{sp}, or octal
 %    numbers given as \texttt{'} followed by digits other than
@@ -140,11 +150,11 @@
 %    or one-character control sequence, given as \texttt{`}\meta{char}.
     \TeX における他のすべての整数と同様，整数オペランドは寸法やスキップ
     の変数（これらは\code{sp}単位の整数値に変換されます），\code{'}に
-    続く8進数，|"|\eghost に続く16進数，あるいは\code{`}\meta{char}の
-    形で表される文字コードでも構いません．
+    続く8進数，|"|に続く16進数，あるいは\code{`}\meta{char}の形で表さ
+    れる文字コードでも構いません．
   \end{texnote}
 \end{function}
-%
+
 \begin{function}[EXP, added = 2018-03-30]{\int_eval:w}
   \begin{syntax}
     \cs{int_eval:w} \meta{integer expression}
@@ -166,7 +176,7 @@
   です．例えば，\code{\cs{int_eval:w} 1 + 1 9}は\code{9}が整数表現の一部
   たり得ないことから\code{29}に展開されます．
 \end{function}
-%
+
 \begin{function}[EXP, added = 2018-11-03]{\int_sign:n}
   \begin{syntax}
     \cs{int_sign:n} \Arg{intexpr}
@@ -176,7 +186,7 @@
   整数表現\meta{integer expression}を評価し，その結果の符号に応じて入力
   ストリームに\code{1}, \code{0}, \code{-1}のいずれかを残します．
 \end{function}
-%
+
 \begin{function}[EXP, updated = 2012-09-26]{\int_abs:n}
   \begin{syntax}
     \cs{int_abs:n} \Arg{integer expression}
@@ -189,7 +199,7 @@
   その結果の絶対値を2回展開の後に明示的な整数リテラルとして入力
   ストリームに残します．
 \end{function}
-%
+
 \begin{function}[EXP, updated = 2012-09-26]{\int_div_round:nn}
   \begin{syntax}
     \cs{int_div_round:nn} \Arg{intexpr_1} \Arg{intexpr_2}
@@ -206,7 +216,7 @@
   中で\code{/}を直接用いる場合と同じ挙動です．演算結果は2回展開の後に
   入力ストリームに明示的な整数リテラルとして残ります．
 \end{function}
-%
+
 \begin{function}[EXP, updated = 2012-02-09]{\int_div_truncate:nn}
   \begin{syntax}
     \cs{int_div_truncate:nn} \Arg{intexpr_1} \Arg{intexpr_2}
@@ -223,7 +233,7 @@
   ことに注意してください．演算結果は2回展開の後に入力ストリームに明示
   的な整数リテラルとして残ります．
 \end{function}
-%
+
 \begin{function}[EXP, updated = 2012-09-26]{\int_max:nn, \int_min:nn}
   \begin{syntax}
     \cs{int_max:nn} \Arg{intexpr_1} \Arg{intexpr_2}
@@ -236,7 +246,7 @@
   各整数表現を\cs{int_eval:n}と同様に評価し，2回展開の後それぞれその
   結果のうち小さくない方と大きくない方を入力ストリームに残します．
 \end{function}
-%
+
 \begin{function}[EXP, updated = 2012-09-26]{\int_mod:nn}
   \begin{syntax}
     \cs{int_mod:nn} \Arg{intexpr_1} \Arg{intexpr_2}
@@ -257,10 +267,10 @@
   \meta{intexpr_2}より小さくなります．演算結果は2回展開の後に入力スト
   リームに明示的な整数リテラルとして残ります．
 \end{function}
-%
+
 %\section{Creating and initialising integers}
 \section{整数の作成と初期化}
-%
+
 \begin{function}{\int_new:N, \int_new:c}
   \begin{syntax}
     \cs{int_new:N} \meta{integer}
@@ -272,7 +282,7 @@
   はエラーが発生します．この宣言はグローバルです．\meta{integer}は$0$に
   初期化されます．
 \end{function}
-%
+
 \begin{function}[updated = 2011-10-22]{\int_const:Nn, \int_const:cn}
   \begin{syntax}
     \cs{int_const:Nn} \meta{integer} \Arg{integer expression}
@@ -284,7 +294,7 @@
   はエラーが発生します．その値はグローバルに\meta{integer expression}に
   設定されます．
 \end{function}
-%
+
 \begin{function}{\int_zero:N, \int_zero:c, \int_gzero:N, \int_gzero:c}
   \begin{syntax}
     \cs{int_zero:N} \meta{integer}
@@ -292,7 +302,7 @@
 %  Sets \meta{integer} to $0$.
   \meta{integer}の値を$0$に設定します．
 \end{function}
-%
+
 \begin{function}[added = 2011-12-13]
   {\int_zero_new:N, \int_zero_new:c, \int_gzero_new:N, \int_gzero_new:c}
   \begin{syntax}
@@ -306,7 +316,7 @@
   存在を確実にし，その後\cs[index=int_zero:N]{int_(g)zero:N}を適用して
   \meta{integer}の値を$0$にします．
 \end{function}
-%
+
 \begin{function}
   {
     \int_set_eq:NN,  \int_set_eq:cN,  \int_set_eq:Nc,  \int_set_eq:cc,
@@ -319,7 +329,7 @@
 %  \meta{integer_2}.
   \meta{integer_1}の値を\meta{integer_2}と等しい値に設定します．
 \end{function}
-%
+
 \begin{function}[EXP, pTF, added=2012-03-03]
   {\int_if_exist:N, \int_if_exist:c}
   \begin{syntax}
@@ -331,10 +341,10 @@
   \meta{int}が現在定義済みかどうかをテストします．この関数は
   \meta{int}が本当に整数変数かどうかは確かめません．
 \end{function}
-%
+
 %\section{Setting and incrementing integers}
 \section{整数の設定とインクリメント}
-%
+
 \begin{function}[updated = 2011-10-22]
   {\int_add:Nn, \int_add:cn, \int_gadd:Nn, \int_gadd:cn}
   \begin{syntax}
@@ -345,7 +355,7 @@
   \meta{integer}の現在の値に\meta{integer expression}の評価結果を
   加えます．
 \end{function}
-%
+
 \begin{function}{\int_decr:N, \int_decr:c, \int_gdecr:N, \int_gdecr:c}
   \begin{syntax}
     \cs{int_decr:N} \meta{integer}
@@ -353,7 +363,7 @@
 %  Decreases the value stored in \meta{integer} by $1$.
   \meta{integer}の値を$1$減じます．
 \end{function}
-%
+
 \begin{function}{\int_incr:N, \int_incr:c, \int_gincr:N, \int_gincr:c}
   \begin{syntax}
     \cs{int_incr:N} \meta{integer}
@@ -361,7 +371,7 @@
 %  Increases the value stored in \meta{integer} by $1$.
   \meta{integer}の値を$1$増やします．
 \end{function}
-%
+
 \begin{function}[updated = 2011-10-22]
   {\int_set:Nn, \int_set:cn, \int_gset:Nn, \int_gset:cn}
   \begin{syntax}
@@ -374,7 +384,7 @@
   \meta{integer expression}の評価結果は必ず整数になる必要があります
   （\cs{int_eval:n}と同様です）．
 \end{function}
-%
+
 \begin{function}[updated = 2011-10-22]
   {\int_sub:Nn, \int_sub:cn, \int_gsub:Nn, \int_gsub:cn}
   \begin{syntax}
@@ -385,10 +395,10 @@
   \meta{integer}の現在の値から\meta{integer expression}の評価結果を
   減じます．
 \end{function}
-%
+
 %\section{Using integers}
 \section{整数の使用}
-%
+
 \begin{function}[updated = 2011-10-22, EXP]{\int_use:N, \int_use:c}
   \begin{syntax}
     \cs{int_use:N} \meta{integer}
@@ -409,9 +419,9 @@
     の\LaTeX3における名称が複数ありますが，そのうちの1つです．
   \end{texnote}
 \end{function}
-%
+
 \section{Integer expression conditionals}
-%
+
 \begin{function}[EXP,pTF]{\int_compare:nNn}
   \begin{syntax}
     \cs{int_compare_p:nNn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \\
@@ -432,7 +442,7 @@
   This function is less flexible than \cs{int_compare:nTF} but around
   $5$~times faster.
 \end{function}
-%
+
 \begin{function}[updated = 2013-01-13, EXP, pTF]{\int_compare:n}
   \begin{syntax}
     \cs{int_compare_p:n} \\
@@ -476,7 +486,7 @@
   This function is more flexible than \cs{int_compare:nNnTF} but
   around $5$~times slower.
 \end{function}
-%
+
 \begin{function}[added = 2013-07-24, EXP, noTF]{\int_case:nn}
   \begin{syntax}
     \cs{int_case:nnTF} \Arg{test integer expression} \\
@@ -511,7 +521,7 @@
   \end{verbatim}
   leaves \enquote{\texttt{Medium}} in the input stream.
 \end{function}
-%
+
 \begin{function}[EXP,pTF]{\int_if_even:n, \int_if_odd:n}
   \begin{syntax}
     \cs{int_if_odd_p:n} \Arg{integer expression}
@@ -522,9 +532,9 @@
   as described for \cs{int_eval:n}. It then evaluates if this
   is odd or even, as appropriate.
 \end{function}
-%
+
 \section{Integer expression loops}
-%
+
 \begin{function}[rEXP]{\int_do_until:nNnn}
   \begin{syntax}
      \cs{int_do_until:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
@@ -536,7 +546,7 @@
   into the input stream again and a loop occurs until the
   \meta{relation} is \texttt{true}.
 \end{function}
-%
+
 \begin{function}[rEXP]{\int_do_while:nNnn}
   \begin{syntax}
      \cs{int_do_while:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
@@ -548,7 +558,7 @@
   into the input stream again and a loop occurs until the
   \meta{relation} is \texttt{false}.
 \end{function}
-%
+
 \begin{function}[rEXP]{\int_until_do:nNnn}
   \begin{syntax}
      \cs{int_until_do:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
@@ -560,7 +570,7 @@
   test is repeated, and a loop occurs until the test is
   \texttt{true}.
 \end{function}
-%
+
 \begin{function}[rEXP]{\int_while_do:nNnn}
   \begin{syntax}
      \cs{int_while_do:nNnn} \Arg{intexpr_1} \meta{relation} \Arg{intexpr_2} \Arg{code}
@@ -572,7 +582,7 @@
   test is repeated, and a loop occurs until the test is
   \texttt{false}.
 \end{function}
-%
+
 \begin{function}[updated = 2013-01-13, rEXP]{\int_do_until:nn}
   \begin{syntax}
      \cs{int_do_until:nn} \Arg{integer relation} \Arg{code}
@@ -584,7 +594,7 @@
   into the input stream again and a loop occurs until the
   \meta{relation} is \texttt{true}.
 \end{function}
-%
+
 \begin{function}[updated = 2013-01-13, rEXP]{\int_do_while:nn}
   \begin{syntax}
      \cs{int_do_while:nn} \Arg{integer relation} \Arg{code}
@@ -596,7 +606,7 @@
   into the input stream again and a loop occurs until the
   \meta{relation} is \texttt{false}.
 \end{function}
-%
+
 \begin{function}[updated = 2013-01-13, rEXP]{\int_until_do:nn}
   \begin{syntax}
      \cs{int_until_do:nn} \Arg{integer relation} \Arg{code}
@@ -608,7 +618,7 @@
   test is repeated, and a loop occurs until the test is
   \texttt{true}.
 \end{function}
-%
+
 \begin{function}[updated = 2013-01-13, rEXP]{\int_while_do:nn}
   \begin{syntax}
      \cs{int_while_do:nn} \Arg{integer relation} \Arg{code}
@@ -620,9 +630,9 @@
   test is repeated, and a loop occurs until the test is
   \texttt{false}.
 \end{function}
-%
+
 \section{Integer step functions}
-%
+
 \begin{function}[added = 2012-06-04, updated = 2018-04-22, rEXP]
   {\int_step_function:nN, \int_step_function:nnN, \int_step_function:nnnN}
   \begin{syntax}
@@ -652,13 +662,13 @@
     [I saw 4] \quad
     [I saw 5] \quad
   \end{quote}
-%
+
   The functions \cs{int_step_function:nN} and \cs{int_step_function:nnN}
   both use a fixed \meta{step} of $1$, and in the case of
   \cs{int_step_function:nN} the \meta{initial value} is also fixed as
   $1$. These functions are provided as simple short-cuts for code clarity.
 \end{function}
-%
+
 \begin{function}[added = 2012-06-04, updated = 2018-04-22]
   {\int_step_inline:nn, \int_step_inline:nnn, \int_step_inline:nnnn}
   \begin{syntax}
@@ -673,13 +683,13 @@
   \meta{value}), the \meta{code} is inserted into the input stream
   with |#1| replaced by the current \meta{value}.  Thus the
   \meta{code} should define a function of one argument~(|#1|).
-%
+
   The functions \cs{int_step_inline:nn} and \cs{int_step_inline:nnn}
   both use a fixed \meta{step} of $1$, and in the case of
   \cs{int_step_inline:nn} the \meta{initial value} is also fixed as
   $1$. These functions are provided as simple short-cuts for code clarity.
 \end{function}
-%
+
 \begin{function}[added = 2012-06-04, updated = 2018-04-22]
   {\int_step_variable:nNn, \int_step_variable:nnNn, \int_step_variable:nnnNn}
   \begin{syntax}
@@ -694,18 +704,18 @@
   \meta{value}), the \meta{code} is inserted into the input stream,
   with the \meta{tl~var} defined as the current \meta{value}.  Thus
   the \meta{code} should make use of the \meta{tl~var}.
-%
+
   The functions \cs{int_step_variable:nNn} and \cs{int_step_variable:nnNn}
   both use a fixed \meta{step} of $1$, and in the case of
   \cs{int_step_variable:nNn} the \meta{initial value} is also fixed as
   $1$. These functions are provided as simple short-cuts for code clarity.
 \end{function}
-%
+
 \section{Formatting integers}
-%
+
 Integers can be placed into the output stream with formatting. These
 conversions apply to any integer expressions.
-%
+
 \begin{function}[updated = 2011-10-22, EXP]{\int_to_arabic:n}
   \begin{syntax}
     \cs{int_to_arabic:n} \Arg{integer expression}
@@ -713,7 +723,7 @@ conversions apply to any integer expressions.
   Places the value of the \meta{integer expression} in the input
   stream as digits, with category code $12$ (other).
 \end{function}
-%
+
 \begin{function}[updated = 2011-09-17, EXP]{\int_to_alph:n, \int_to_Alph:n}
   \begin{syntax}
     \cs{int_to_alph:n} \Arg{integer expression}
@@ -741,7 +751,7 @@ conversions apply to any integer expressions.
   The resulting tokens are digits with category code $12$ (other) and
   letters with category code $11$ (letter).
 \end{function}
-%
+
 \begin{function}[updated = 2011-09-17, EXP]{\int_to_symbols:nnn}
   \begin{syntax}
     \cs{int_to_symbols:nnn}
@@ -769,7 +779,7 @@ conversions apply to any integer expressions.
       }
   \end{verbatim}
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, EXP]{\int_to_bin:n}
   \begin{syntax}
     \cs{int_to_bin:n} \Arg{integer expression}
@@ -777,7 +787,7 @@ conversions apply to any integer expressions.
   Calculates the value of the \meta{integer expression} and places
   the binary representation of the result in the input stream.
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, EXP]{\int_to_hex:n, \int_to_Hex:n}
   \begin{syntax}
     \cs{int_to_hex:n} \Arg{integer expression}
@@ -790,7 +800,7 @@ conversions apply to any integer expressions.
   The resulting tokens are digits with category code $12$ (other) and
   letters with category code $11$ (letter).
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, EXP]{\int_to_oct:n}
   \begin{syntax}
     \cs{int_to_oct:n} \Arg{integer expression}
@@ -801,7 +811,7 @@ conversions apply to any integer expressions.
   The resulting tokens are digits with category code $12$ (other) and
   letters with category code $11$ (letter).
 \end{function}
-%
+
 \begin{function}[updated = 2014-02-11, EXP]
   {\int_to_base:nn, \int_to_Base:nn}
   \begin{syntax}
@@ -821,7 +831,7 @@ conversions apply to any integer expressions.
     This is a generic version of \cs{int_to_bin:n}, \emph{etc.}
   \end{texnote}
 \end{function}
-%
+
 \begin{function}[updated = 2011-10-22, rEXP]{\int_to_roman:n, \int_to_Roman:n}
   \begin{syntax}
     \cs{int_to_roman:n} \Arg{integer expression}
@@ -835,9 +845,9 @@ conversions apply to any integer expressions.
   is \emph{not} used.  For instance \cs{int_to_roman:n} |{| 8249 |}|
   expands to |mmmmmmmmccxlix|.
 \end{function}
-%
+
 \section{Converting from other formats to integers}
-%
+
 \begin{function}[updated = 2014-08-25, EXP]{\int_from_alph:n}
   \begin{syntax}
     \cs{int_from_alph:n} \Arg{letters}
@@ -851,7 +861,7 @@ conversions apply to any integer expressions.
   is the inverse function of \cs{int_to_alph:n} and
   \cs{int_to_Alph:n}.
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
   {\int_from_bin:n}
   \begin{syntax}
@@ -864,7 +874,7 @@ conversions apply to any integer expressions.
   and~|-|, followed by binary digits.  This is the inverse function
   of \cs{int_to_bin:n}.
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
   {\int_from_hex:n}
   \begin{syntax}
@@ -878,7 +888,7 @@ conversions apply to any integer expressions.
   a leading sign, made of |+| and~|-|.  This is the inverse function
   of \cs{int_to_hex:n} and \cs{int_to_Hex:n}.
 \end{function}
-%
+
 \begin{function}[added = 2014-02-11, updated = 2014-08-25, EXP]
   {\int_from_oct:n}
   \begin{syntax}
@@ -891,7 +901,7 @@ conversions apply to any integer expressions.
   and~|-|, followed by octal digits.  This is the inverse function
   of \cs{int_to_oct:n}.
 \end{function}
-%
+
 \begin{function}[updated = 2014-08-25, updated = 2014-08-25, EXP]
   {\int_from_roman:n}
   \begin{syntax}
@@ -905,7 +915,7 @@ conversions apply to any integer expressions.
   resulting value is $-1$.  This is the inverse function of
   \cs{int_to_roman:n} and \cs{int_to_Roman:n}.
 \end{function}
-%
+
 \begin{function}[updated = 2014-08-25, EXP]{\int_from_base:nn}
   \begin{syntax}
     \cs{int_from_base:nn} \Arg{number} \Arg{base}
@@ -918,9 +928,9 @@ conversions apply to any integer expressions.
   This is the inverse function of \cs{int_to_base:nn} and
   \cs{int_to_Base:nn}.
 \end{function}
-%
+
 \section{Random integers}
-%
+
 \begin{function}[EXP, added = 2016-12-06, updated = 2018-04-27]{\int_rand:nn}
   \begin{syntax}
     \cs{int_rand:nn} \Arg{intexpr_1} \Arg{intexpr_2}
@@ -929,7 +939,7 @@ conversions apply to any integer expressions.
   pseudo-random number between the two (with bounds included).
   This is not available in older versions of \XeTeX{}.
 \end{function}
-%
+
 \begin{function}[EXP, added = 2018-05-05]{\int_rand:n}
   \begin{syntax}
     \cs{int_rand:n} \Arg{intexpr}
@@ -938,16 +948,16 @@ conversions apply to any integer expressions.
   pseudo-random number between $1$ and the \meta{intexpr} (included).
   This is not available in older versions of \XeTeX{}.
 \end{function}
-%
+
 \section{Viewing integers}
-%
+
 \begin{function}{\int_show:N, \int_show:c}
   \begin{syntax}
     \cs{int_show:N} \meta{integer}
   \end{syntax}
   Displays the value of the \meta{integer} on the terminal.
 \end{function}
-%
+
 \begin{function}[added = 2011-11-22, updated = 2015-08-07]{\int_show:n}
   \begin{syntax}
     \cs{int_show:n} \Arg{integer expression}
@@ -955,14 +965,14 @@ conversions apply to any integer expressions.
   Displays the result of evaluating the \meta{integer expression}
   on the terminal.
 \end{function}
-%
+
 \begin{function}[added = 2014-08-22, updated = 2015-08-03]{\int_log:N, \int_log:c}
   \begin{syntax}
     \cs{int_log:N} \meta{integer}
   \end{syntax}
   Writes the value of the \meta{integer} in the log file.
 \end{function}
-%
+
 \begin{function}[added = 2014-08-22, updated = 2015-08-07]{\int_log:n}
   \begin{syntax}
     \cs{int_log:n} \Arg{integer expression}
@@ -970,45 +980,45 @@ conversions apply to any integer expressions.
   Writes the result of evaluating the \meta{integer expression}
   in the log file.
 \end{function}
-%
+
 \section{Constant integers}
-%
+
 \begin{variable}[added = 2018-05-07]{\c_zero_int, \c_one_int}
   Integer values used with primitive tests and assignments: their
   self-terminating nature makes these more convenient and faster than
   literal numbers.
 \end{variable}
-%
+
 \begin{variable}{\c_max_int}
   The maximum value that can be stored as an integer.
 \end{variable}
-%
+
 \begin{variable}{\c_max_register_int}
   Maximum number of registers.
 \end{variable}
-%
+
 \begin{variable}{\c_max_char_int}
   Maximum character code completely supported by the engine.
 \end{variable}
-%
+
 \section{Scratch integers}
-%
+
 \begin{variable}{\l_tmpa_int, \l_tmpb_int}
   Scratch integer for local assignment. These are never used by
   the kernel code, and so are safe for use with any \LaTeX3-defined
   function. However, they may be overwritten by other non-kernel
   code and so should only be used for short-term storage.
 \end{variable}
-%
+
 \begin{variable}{\g_tmpa_int, \g_tmpb_int}
   Scratch integer for global assignment. These are never used by
   the kernel code, and so are safe for use with any \LaTeX3-defined
   function. However, they may be overwritten by other non-kernel
   code and so should only be used for short-term storage.
 \end{variable}
-%
+
 \subsection{Direct number expansion}
-%
+
 \begin{function}[EXP, added = 2018-03-27]{\int_value:w}
   \begin{syntax}
     \cs{int_value:w} \meta{integer}
@@ -1029,7 +1039,7 @@ conversions apply to any integer expressions.
   space it is removed as in \texttt{f}-expansion, and so \cs{exp_stop_f:}
   may be employed as an end marker. Note that protected functions
   \emph{are} expanded by this process.
-%
+
   This function requires exactly one expansion to produce a value, and so
   is suitable for use in cases where a number is required \enquote{directly}.
   In general, \cs{int_eval:n} is the preferred approach to generating
@@ -1038,9 +1048,9 @@ conversions apply to any integer expressions.
     This is the \TeX{} primitive \tn{number}.
   \end{texnote}
 \end{function}
-%
+
 \section{Primitive conditionals}
-%
+
 \begin{function}[EXP]{\if_int_compare:w}
   \begin{syntax}
     \cs{if_int_compare:w} \meta{integer_1} \meta{relation} \meta{integer_2}
@@ -1056,7 +1066,7 @@ conversions apply to any integer expressions.
     These are both names for the \TeX{} primitive \tn{ifnum}.
   \end{texnote}
 \end{function}
-%
+
 \begin{function}[EXP]{\if_case:w, \or:}
   \begin{syntax}
     \cs{if_case:w} \meta{integer} \meta{case_0}
@@ -1074,7 +1084,7 @@ conversions apply to any integer expressions.
     These are the \TeX{} primitives \tn{ifcase} and \tn{or}.
   \end{texnote}
 \end{function}
-%
+
 \begin{function}[EXP]{\if_int_odd:w}
   \begin{syntax}
     \cs{if_int_odd:w} \meta{tokens}  \meta{optional space}
@@ -1090,9 +1100,9 @@ conversions apply to any integer expressions.
     This is the \TeX{} primitive \tn{ifodd}.
   \end{texnote}
 \end{function}
-%
+
 \end{documentation}
-%
+
 \PrintIndex
-%
+
 \end{document}

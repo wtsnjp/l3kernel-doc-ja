@@ -76,8 +76,9 @@
 \cs_set_eq:NN \PassOptionsToClass \__wtpl_original_pass_options_to_class:nn
 
 %% 余白設定（TODO: 要検討）
-\addtolength \oddsidemargin { 55pt }
-\addtolength \evensidemargin { 55pt }
+\addtolength \marginparwidth { -20pt }
+\addtolength \oddsidemargin  {  55pt }
+\addtolength \evensidemargin {  55pt }
 
 %% 日本語用設定
 \DeclareTextFontCommand { \emph } { \sffamily\gtfamily }
