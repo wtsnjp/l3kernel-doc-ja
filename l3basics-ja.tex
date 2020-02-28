@@ -823,17 +823,26 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   関数のところで説明されるように評価されます．
 \end{function}
 
-\subsection{Copying control sequences}
+%\subsection{Copying control sequences}
+\subsection{制御綴の複製}
 
-Control sequences (not just functions as defined above) can
-be set to have the same meaning using the functions described
-here. Making two control sequences equivalent means that the
-second control sequence is a \emph{copy} of the first (rather than
-a pointer to it). Thus the old and new control sequence are not
-tied together: changes to one are not reflected in the other.
+%Control sequences (not just functions as defined above) can
+%be set to have the same meaning using the functions described
+%here. Making two control sequences equivalent means that the
+%second control sequence is a \emph{copy} of the first (rather than
+%a pointer to it). Thus the old and new control sequence are not
+%tied together: changes to one are not reflected in the other.
+制御綴は（上記の方法で定義された関数以外のものも含めて）ここで紹介する
+関数を用いることにより，別の制御綴と同一の意味を持つように設定することが
+可能です．2つの制御綴を同一化するということは，一方の制御綴をもう一方に
+（ポインタを張るのではなく）コピーするということを意味します．したがって
+元の制御綴と新しい制御綴は互いに関係を持ちません．つまり，一方の意味を
+変更したとしても，もう一方には影響を及ぼさないということです．
 
-In the following text \enquote{cs} is used as an abbreviation for
-\enquote{control sequence}.
+%In the following text \enquote{cs} is used as an abbreviation for
+%\enquote{control sequence}.
+以下の説明では略語\enquote{cs}を制御綴 (control sequence) の意味で
+用います．
 
 \begin{function}
   {\cs_new_eq:NN, \cs_new_eq:Nc, \cs_new_eq:cN, \cs_new_eq:cc}
@@ -841,10 +850,13 @@ In the following text \enquote{cs} is used as an abbreviation for
     \cs{cs_new_eq:NN} \meta{cs_1} \meta{cs_2}
     \cs{cs_new_eq:NN} \meta{cs_1} \meta{token}
   \end{syntax}
-  Globally creates \meta{control sequence_1} and sets it to have the same
-  meaning as \meta{control sequence_2} or <token>.
-  The second control sequence may
-  subsequently be altered without affecting the copy.
+%  Globally creates \meta{control sequence_1} and sets it to have the same
+%  meaning as \meta{control sequence_2} or <token>.
+%  The second control sequence may
+%  subsequently be altered without affecting the copy.
+  \meta{cs_1}をグローバルに作成し，その意味を\meta{cs_2}または\meta{token}と
+  同じものに設定します．\meta{cs_2}の意味がその後に変更されたとしても，
+  コピーには影響を与えません．
 \end{function}
 
 \begin{function}
@@ -853,12 +865,15 @@ In the following text \enquote{cs} is used as an abbreviation for
     \cs{cs_set_eq:NN} \meta{cs_1} \meta{cs_2}
     \cs{cs_set_eq:NN} \meta{cs_1} \meta{token}
   \end{syntax}
-  Sets \meta{control sequence_1} to have the same meaning as
-  \meta{control sequence_2} (or <token>).
-  The second control sequence may subsequently be
-  altered without affecting the copy. The assignment of a meaning
-  to the \meta{control sequence_1} is restricted to the current
-  \TeX{} group level.
+%  Sets \meta{control sequence_1} to have the same meaning as
+%  \meta{control sequence_2} (or <token>).
+%  The second control sequence may subsequently be
+%  altered without affecting the copy. The assignment of a meaning
+%  to the \meta{control sequence_1} is restricted to the current
+%  \TeX{} group level.
+  \meta{cs_1}を\meta{cs_2}または\meta{token}と同じ意味を持つように設定します．
+  \meta{cs_2}の意味がその後に変更されたとしても，コピーには影響を与えません．
+  \meta{cs_1}への意味の代入は現在の\TeX グループの中でのみ有効です．
 \end{function}
 
 \begin{function}
@@ -867,12 +882,16 @@ In the following text \enquote{cs} is used as an abbreviation for
     \cs{cs_gset_eq:NN} \meta{cs_1} \meta{cs_2}
     \cs{cs_gset_eq:NN} \meta{cs_1} \meta{token}
   \end{syntax}
-  Globally sets \meta{control sequence_1} to have the same meaning as
-  \meta{control sequence_2} (or <token>).
-  The second control sequence may subsequently be
-  altered without affecting the copy. The assignment of a meaning to
-  the \meta{control sequence_1} is \emph{not} restricted to the current
-  \TeX{} group level: the assignment is global.
+%  Globally sets \meta{control sequence_1} to have the same meaning as
+%  \meta{control sequence_2} (or <token>).
+%  The second control sequence may subsequently be
+%  altered without affecting the copy. The assignment of a meaning to
+%  the \meta{control sequence_1} is \emph{not} restricted to the current
+%  \TeX{} group level: the assignment is global.
+  \meta{cs_1}を\meta{cs_2}または\meta{token}と同じ意味を持つようにグローバル
+  に設定します．\meta{cs_2}の意味がその後に変更されたとしても，コピーには
+  影響を与えません．\meta{cs_1}への意味の代入は現在の\TeX グループの中に
+  制限されません．この代入はグローバルです．
 \end{function}
 
 \subsection{Deleting control sequences}
