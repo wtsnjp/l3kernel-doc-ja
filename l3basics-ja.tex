@@ -894,53 +894,70 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   制限されません．この代入はグローバルです．
 \end{function}
 
-\subsection{Deleting control sequences}
+%\subsection{Deleting control sequences}
+\subsection{制御綴の削除}
 
-There are occasions where control sequences need to be deleted.
-This is handled in a very simple manner.
+%There are occasions where control sequences need to be deleted.
+%This is handled in a very simple manner.
+時として制御綴を削除したい場合があります．次の関数は，この需要をとても
+シンプルに満たします．
 
 \begin{function}[updated = 2011-09-15]{\cs_undefine:N, \cs_undefine:c}
   \begin{syntax}
     \cs{cs_undefine:N} \meta{control sequence}
   \end{syntax}
-  Sets \meta{control sequence} to be globally undefined.
+%  Sets \meta{control sequence} to be globally undefined.
+  制御綴\meta{control sequence}をグローバルに未定義にします．
 \end{function}
 
-\subsection{Showing control sequences}
+%\subsection{Showing control sequences}
+\subsection{制御綴の表示}
 
 \begin{function}[EXP, updated = 2011-12-22]{\cs_meaning:N, \cs_meaning:c}
   \begin{syntax}
     \cs{cs_meaning:N} \meta{control sequence}
   \end{syntax}
-  This function expands to the \emph{meaning} of the \meta{control sequence}
-  control sequence. For a macro, this includes the \meta{replacement text}.
-  \begin{texnote}
-    This is \TeX{}'s \tn{meaning} primitive.
-    For tokens that are not control sequences, it is more logical to
-    use \cs{token_to_meaning:N}.
-    The \texttt{c} variant correctly reports undefined arguments.
-  \end{texnote}
+%  This function expands to the \emph{meaning} of the \meta{control sequence}
+%  control sequence. For a macro, this includes the \meta{replacement text}.
+  この関数は制御綴\meta{control sequence}の「意味」へと展開されます．
+  マクロについては，その「意味」には置換テキストも含まれます．
 \end{function}
+
+\begin{texnote}
+%  This is \TeX{}'s \tn{meaning} primitive.
+%  For tokens that are not control sequences, it is more logical to
+%  use \cs{token_to_meaning:N}.
+%  The \texttt{c} variant correctly reports undefined arguments.
+  これは\TeX の\tn{meaning}プリミティブです．制御綴以外のトークンに対しては
+  \cs{token_to_meaning:N}関数を用いる方が論理的です．\code{c}変種では，
+  未定義の制御綴名についてはその旨を正しく報告します．
+\end{texnote}
 
 \begin{function}[updated = 2017-02-14]{\cs_show:N, \cs_show:c}
   \begin{syntax}
     \cs{cs_show:N} \meta{control sequence}
   \end{syntax}
-  Displays the definition of the \meta{control sequence} on the
-  terminal.
-  \begin{texnote}
-    This is similar to the \TeX{} primitive \tn{show}, wrapped to a
-    fixed number of characters per line.
-  \end{texnote}
+%  Displays the definition of the \meta{control sequence} on the
+%  terminal.
+  制御綴\meta{control sequence}の定義をターミナルに表示します．
 \end{function}
+
+\begin{texnote}
+%  This is similar to the \TeX{} primitive \tn{show}, wrapped to a
+%  fixed number of characters per line.
+  これは\TeX プリミティブ\tn{show}と類似していますが，行における文字数が
+  固定されるようラップされています．
+\end{texnote}
 
 \begin{function}[added = 2014-08-22, updated = 2017-02-14]{\cs_log:N, \cs_log:c}
   \begin{syntax}
     \cs{cs_log:N} \meta{control sequence}
   \end{syntax}
-  Writes the definition of the \meta{control sequence} in the log
-  file.  See also \cs{cs_show:N} which displays the result in the
-  terminal.
+%  Writes the definition of the \meta{control sequence} in the log
+%  file.  See also \cs{cs_show:N} which displays the result in the
+%  terminal.
+  制御綴\meta{control sequence}の定義をログファイルに書き込みます．
+  ターミナルに定義を表示する\cs{cs_show:N}も参照してください．
 \end{function}
 
 \subsection{Converting to and from control sequences}
