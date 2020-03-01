@@ -921,17 +921,17 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
 %  control sequence. For a macro, this includes the \meta{replacement text}.
   この関数は制御綴\meta{control sequence}の「意味」へと展開されます．
   マクロについては，その「意味」には置換テキストも含まれます．
+  %
+  \begin{texnote}
+  %  This is \TeX{}'s \tn{meaning} primitive.
+  %  For tokens that are not control sequences, it is more logical to
+  %  use \cs{token_to_meaning:N}.
+  %  The \texttt{c} variant correctly reports undefined arguments.
+    これは\TeX の\tn{meaning}プリミティブです．制御綴以外のトークンに対しては
+    \cs{token_to_meaning:N}関数を用いる方が論理的です．\code{c}変種では，
+    未定義の制御綴名についてはその旨を正しく報告します．
+  \end{texnote}
 \end{function}
-
-\begin{texnote}
-%  This is \TeX{}'s \tn{meaning} primitive.
-%  For tokens that are not control sequences, it is more logical to
-%  use \cs{token_to_meaning:N}.
-%  The \texttt{c} variant correctly reports undefined arguments.
-  これは\TeX の\tn{meaning}プリミティブです．制御綴以外のトークンに対しては
-  \cs{token_to_meaning:N}関数を用いる方が論理的です．\code{c}変種では，
-  未定義の制御綴名についてはその旨を正しく報告します．
-\end{texnote}
 
 \begin{function}[updated = 2017-02-14]{\cs_show:N, \cs_show:c}
   \begin{syntax}
@@ -940,14 +940,14 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
 %  Displays the definition of the \meta{control sequence} on the
 %  terminal.
   制御綴\meta{control sequence}の定義をターミナルに表示します．
+  %
+  \begin{texnote}
+  %  This is similar to the \TeX{} primitive \tn{show}, wrapped to a
+  %  fixed number of characters per line.
+    これは\TeX プリミティブ\tn{show}と類似していますが，行における文字数が
+    固定されるようラップされています．
+  \end{texnote}
 \end{function}
-
-\begin{texnote}
-%  This is similar to the \TeX{} primitive \tn{show}, wrapped to a
-%  fixed number of characters per line.
-  これは\TeX プリミティブ\tn{show}と類似していますが，行における文字数が
-  固定されるようラップされています．
-\end{texnote}
 
 \begin{function}[added = 2014-08-22, updated = 2017-02-14]{\cs_log:N, \cs_log:c}
   \begin{syntax}

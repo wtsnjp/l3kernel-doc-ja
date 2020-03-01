@@ -119,6 +119,7 @@
   { \eghostguarded { \__wtpl_codedoc_cmd:nn {#1} {#2} } }
 
 %% 枠
+\cs_new_eq:NN \__wtpl_codedoc_function_end: \__codedoc_function_end:
 \DeclareTColorBox { texnote } {}
   {
     empty, left=2mm, right=2mm, top=-1mm,
@@ -126,7 +127,8 @@
     boxed~title~style={
       empty, left=-1mm, right=-1mm,
     },
-    colframe=black, coltitle=black, coltext=black, breakable,  
+    colframe=black, coltitle=black, coltext=black,
+    %breakable,  % function環境の中だとうまくいかないことがある
     underlay~unbroken={
       \draw [black, line~width=.5pt]
         (title.east) -- (title.east-|frame.east) -- (frame.south~east)
