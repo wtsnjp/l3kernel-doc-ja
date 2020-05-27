@@ -960,42 +960,62 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
   ターミナルに定義を表示する\cs{cs_show:N}も参照してください．
 \end{function}
 
-\subsection{Converting to and from control sequences}
+%\subsection{Converting to and from control sequences}
+\subsection{制御綴と文字列の相互変換}
 
 \begin{function}[EXP]{\use:c}
   \begin{syntax}
     \cs{use:c} \Arg{control sequence name}
   \end{syntax}
-  Expands the \meta{control sequence name} until only characters
-  remain, and then converts this into a control sequence. This process
-  requires two expansions.  As in other \texttt{c}-type arguments the
-  \meta{control sequence name} must, when fully expanded, consist of
-  character tokens, typically a mixture of category code $10$ (space),
-  $11$ (letter) and $12$ (other).
+%  Expands the \meta{control sequence name} until only characters
+%  remain, and then converts this into a control sequence. This process
+%  requires two expansions.  As in other \texttt{c}-type arguments the
+%  \meta{control sequence name} must, when fully expanded, consist of
+%  character tokens, typically a mixture of category code $10$ (space),
+%  $11$ (letter) and $12$ (other).
+  制御綴名\meta{control sequence name}を文字のみが残る状態まで展開し，
+  その後その文字列を制御綴へと変換します．この処理には2回の展開が必要
+  です．他の\code{c}タイプの引数と同様に\meta{control sequence name}は
+  完全展開された状態では必ず文字トークンで構成されている必要があります．
+  つまり，典型的にはカテゴリーコードが$10$（空白），$11$（文字），$12$
+  （その他の文字）のいずれかをもつトークンの混合になります．
+%
   \begin{texnote}
-    Protected macros that appear in a \texttt{c}-type argument are
-    expanded despite being protected; \cs{exp_not:n} also has no
-    effect.  An internal error occurs if non-characters or active
-    characters remain after full expansion, as the conversion to a
-    control sequence is not possible.
+%    Protected macros that appear in a \texttt{c}-type argument are
+%    expanded despite being protected; \cs{exp_not:n} also has no
+%    effect.  An internal error occurs if non-characters or active
+%    characters remain after full expansion, as the conversion to a
+%    control sequence is not possible.
+    \code{c}タイプの引数の中では保護付きのマクロも関係なく展開されます．
+    \cs{exp_not:n}も同様に無効です．完全展開の後も文字以外のトークンや
+    アクティブ文字が残る場合，制御綴への変換ができないため内部エラーが
+    発生します．
   \end{texnote}
 \end{function}
 
-As an example of the \cs{use:c} function, both
+%As an example of the \cs{use:c} function, both
+\cs{use:c}の使用例を挙げます．
+%
   \begin{verbatim}
     \use:c { a b c }
   \end{verbatim}
-  and
+%
+%  and
+  および
+%
   \begin{verbatim}
     \tl_new:N  \l_my_tl
     \tl_set:Nn \l_my_tl { a b c }
     \use:c { \tl_use:N \l_my_tl }
   \end{verbatim}
-  would be equivalent to
+%
+%  would be equivalent to
+  はいずれも，\cs{use:c}を2回展開した後に以下と同義です：
+%
   \begin{verbatim}
     \abc
   \end{verbatim}
-  after two expansions of \cs{use:c}.
+%  after two expansions of \cs{use:c}.
 
 \begin{function}[noTF, EXP, added = 2012-11-10]
   {\cs_if_exist_use:N, \cs_if_exist_use:c}
@@ -1003,61 +1023,86 @@ As an example of the \cs{use:c} function, both
     \cs{cs_if_exist_use:N} \meta{control sequence}
     \cs{cs_if_exist_use:NTF} \meta{control sequence} \Arg{true code} \Arg{false code}
   \end{syntax}
-  Tests whether the \meta{control sequence} is currently defined
-  according to the conditional \cs{cs_if_exist:NTF}
-  (whether as a function or another control sequence type), and if it
-  is inserts the  \meta{control sequence} into the input stream followed
-  by the \meta{true code}.  Otherwise the \meta{false code} is used.
+%  Tests whether the \meta{control sequence} is currently defined
+%  according to the conditional \cs{cs_if_exist:NTF}
+%  (whether as a function or another control sequence type), and if it
+%  is inserts the  \meta{control sequence} into the input stream followed
+%  by the \meta{true code}.  Otherwise the \meta{false code} is used.
+  \meta{control sequence}が現時点で定義済みか否かを条件分岐
+  \cs{cs_if_exist:NTF}に基づいてテストし（関数かその他の制御綴かは
+  問われません），定義済みの場合は\meta{control sequence}とその直後に
+  \meta{true code}を入力ストリームに挿入します．一方，未定義の場合は
+  \meta{false code}が使われます．
 \end{function}
 
 \begin{function}[EXP]{\cs:w, \cs_end:}
   \begin{syntax}
     \cs{cs:w} \meta{control sequence name} \cs{cs_end:}
   \end{syntax}
-  Converts the given \meta{control sequence name} into a single
-  control sequence token. This process requires one expansion.
-  The content for \meta{control sequence name} may be literal
-  material or from other expandable functions. The
-  \meta{control sequence name} must, when fully expanded, consist
-  of character tokens which are not active: typically
-  of category code $10$ (space), $11$ (letter)
-  or $12$ (other), or a mixture of these.
+%  Converts the given \meta{control sequence name} into a single
+%  control sequence token. This process requires one expansion.
+%  The content for \meta{control sequence name} may be literal
+%  material or from other expandable functions. The
+%  \meta{control sequence name} must, when fully expanded, consist
+%  of character tokens which are not active: typically
+%  of category code $10$ (space), $11$ (letter)
+%  or $12$ (other), or a mixture of these.
+  与えられた\meta{control sequence name}を1つの制御綴トークンに変換
+  します．この処理には展開が必要です．\meta{control sequence name}には
+  単純な文字列か他の展開可能関数を含めることができます．\meta{control
+  sequence name}は完全展開ののちアクティブでない文字トークンのみで構成
+  されている必要があります．典型的には，カテゴリーコード$10$（空白），
+  $11$（文字），$12$（その他）およびこれらの混合ということになります．
+%
   \begin{texnote}
-    These are the \TeX{} primitives \tn{csname} and \tn{endcsname}.
+%    These are the \TeX{} primitives \tn{csname} and \tn{endcsname}.
+    これらは\TeX プリミティブ\tn{csname}と\tn{endcsname}です．
   \end{texnote}
 \end{function}
 
-As an example of the \cs{cs:w} and \cs{cs_end:} functions, both
+\cs{cs:w}と\cs{cs_end:}の利用例を挙げます．
+%As an example of the \cs{cs:w} and \cs{cs_end:} functions, both
   \begin{verbatim}
     \cs:w a b c \cs_end:
   \end{verbatim}
-  and
+  および
+%  and
   \begin{verbatim}
     \tl_new:N  \l_my_tl
     \tl_set:Nn \l_my_tl { a b c }
     \cs:w \tl_use:N \l_my_tl \cs_end:
   \end{verbatim}
-  would be equivalent to
+  はいずれも1回展開の後
+%  would be equivalent to
   \begin{verbatim}
     \abc
   \end{verbatim}
-  after one expansion of \cs{cs:w}.
+  と等価になります．
+%  after one expansion of \cs{cs:w}.
 
 \begin{function}[EXP]{\cs_to_str:N}
   \begin{syntax}
     \cs{cs_to_str:N} \meta{control sequence}
   \end{syntax}
-  Converts the given \meta{control sequence} into a series of
-  characters with category code $12$ (other), except spaces,
-  of category code $10$. The result does \emph{not} include
-  the current escape token, contrarily to \cs{token_to_str:N}.
-  Full expansion of this function requires exactly $2$ expansion
-  steps, and so an \texttt{x}-type or \texttt{e}-type expansion, or two
-  \texttt{o}-type expansions are required to
-  convert the \meta{control sequence} to a sequence of characters
-  in the input stream. In most cases, an \texttt{f}-expansion
-  is correct as well, but this loses a space at the start
-  of the result.
+  与えられた\meta{control sequence}を，空白（カテゴリーコード10）を除きすべて
+  カテゴリーコード12（その他）の文字の列に変換します．\cs{token_to_str:N}とは
+  異なり，変換決kは現在のエスケープ文字を\emph{含みません}．この関数を完全に
+  展開するにはちょうど2回の展開が必要です．つまり\meta{control sequence}を文字
+  の列に変換して入力ストリームに送るには，1回の\code{x}タイプまたは\code{e}%
+  タイプの展開もしくは2回の\code{o}タイプによる展開が必要となります．ほとんどの
+  場合，\code{f}展開を1回行っても問題ありませんが，変換結果の冒頭の空白文字が
+  1つ消えてしまいます．
+%  Converts the given \meta{control sequence} into a series of
+%  characters with category code $12$ (other), except spaces,
+%  of category code $10$. The result does \emph{not} include
+%  the current escape token, contrarily to \cs{token_to_str:N}.
+%  Full expansion of this function requires exactly $2$ expansion
+%  steps, and so an \texttt{x}-type or \texttt{e}-type expansion, or two
+%  \texttt{o}-type expansions are required to
+%  convert the \meta{control sequence} to a sequence of characters
+%  in the input stream. In most cases, an \texttt{f}-expansion
+%  is correct as well, but this loses a space at the start
+%  of the result.
 \end{function}
 
 \section{Analysing control sequences}
