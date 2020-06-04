@@ -1105,45 +1105,63 @@ defining-new-function-2}節で説明する関数は\emph{基本関数}のみを�
 %  of the result.
 \end{function}
 
-\section{Analysing control sequences}
+%\section{Analysing control sequences}
+\section{制御綴の分析}
 
 \begin{function}[EXP, added = 2018-04-06]{\cs_split_function:N}
   \begin{syntax}
     \cs{cs_split_function:N} \meta{function}
   \end{syntax}
-  Splits the \meta{function} into the \meta{name} (\emph{i.e.}~the part
-  before the colon) and the \meta{signature} (\emph{i.e.}~after the colon).
-  This information is then placed in the input stream
-  in three parts: the \meta{name}, the
-  \meta{signature} and a logic token indicating if a colon was found
-  (to differentiate variables from function names). The \meta{name}
-  does not include the escape character, and both the \meta{name} and
-  \meta{signature} are made up of tokens with category code $12$
-  (other).
+%  Splits the \meta{function} into the \meta{name} (\emph{i.e.}~the part
+%  before the colon) and the \meta{signature} (\emph{i.e.}~after the colon).
+%  This information is then placed in the input stream
+%  in three parts: the \meta{name}, the
+%  \meta{signature} and a logic token indicating if a colon was found
+%  (to differentiate variables from function names). The \meta{name}
+%  does not include the escape character, and both the \meta{name} and
+%  \meta{signature} are made up of tokens with category code $12$
+%  (other).
+  関数\meta{function}を\meta{name}（コロンより前の部分）と\meta{sigunature}%
+  （コロンより後ろの部分）に分割します．得られた情報は3つのパートに分けて
+  入力ストリームに置かれます：順に\meta{name}，\meta{signature}，そしてコロン
+  が見つかったかどうかを表す論理トークン（これは変数を関数と区別するため）です．
+  ここで\meta{name}にはエスケープ文字は含まれず，また\meta{name}および
+  \meta{signature}はカテゴリーコード12の文字で構成されます．
 \end{function}
 
-The next three functions decompose \TeX{} macros into their
-constituent parts: if the \meta{token} passed is not a macro then no
-decomposition can occur. In the latter case, all three functions leave
-\cs{scan_stop:} in the input stream.
+%The next three functions decompose \TeX{} macros into their
+%constituent parts: if the \meta{token} passed is not a macro then no
+%decomposition can occur. In the latter case, all three functions leave
+%\cs{scan_stop:} in the input stream.
+次の3つの関数は\TeX マクロをその構成要素に分解します．渡された\meta{token}が
+マクロでない場合は分解は行われません．その場合，3つの関数は\cs{scan_stop:}%
+を入力ストリームに残します．
 
 \begin{function}[EXP, added = 2019-02-27]{\cs_prefix_spec:N}
   \begin{syntax}
     \cs{cs_prefix_spec:N} \meta{token}
   \end{syntax}
-  If the \meta{token} is a macro, this function leaves the applicable
-  \TeX{} prefixes in input stream as a string of tokens of category
-  code $12$ (with spaces having category code $10$). Thus for example
+%  If the \meta{token} is a macro, this function leaves the applicable
+%  \TeX{} prefixes in input stream as a string of tokens of category
+%  code $12$ (with spaces having category code $10$). Thus for example
+  \meta{token}がマクロの場合，適用されている\TeX プレフィックスを入力
+  ストリームにカテゴリーコード$12$の文字（空白文字はカテゴリーコード
+  $10$）の列として残します．したがって
   \begin{verbatim}
     \cs_set:Npn \next:nn #1#2 { x #1~y #2 }
     \cs_prefix_spec:N \next:nn
   \end{verbatim}
-  leaves |\long| in the input stream. If the \meta{token} is
-  not a macro then \cs{scan_stop:} is left in the input stream.
+%  leaves |\long| in the input stream. If the \meta{token} is
+%  not a macro then \cs{scan_stop:} is left in the input stream.
+  では|\long|が入力ストリームに残ります．もし\meta{token}がマクロで
+  ない場合は\cs{scan_stop:}が入力ストリームに置かれます．
   \begin{texnote}
-    The prefix can be empty, |\long|, |\protected| or
-    |\protected\long| with backslash replaced by the current escape
-    character.
+%    The prefix can be empty, |\long|, |\protected| or
+%    |\protected\long| with backslash replaced by the current escape
+%    character.
+    プレフィックスは空文字列，|\long|，|\protected|，|\protected\long|の
+    いずれかです．ここでバックスラッシュは現時点におけるエスケープ文字に
+    置き換えられます．
   \end{texnote}
 \end{function}
 
@@ -1151,19 +1169,25 @@ decomposition can occur. In the latter case, all three functions leave
   \begin{syntax}
     \cs{cs_argument_spec:N} \meta{token}
   \end{syntax}
-  If the \meta{token} is a macro, this function leaves the primitive
-  \TeX{} argument specification in input stream as a string of
-  character tokens of category code $12$ (with spaces having category
-  code $10$). Thus for example
+%  If the \meta{token} is a macro, this function leaves the primitive
+%  \TeX{} argument specification in input stream as a string of
+%  character tokens of category code $12$ (with spaces having category
+%  code $10$). Thus for example
+  \meta{token}がマクロの場合，\TeX 言語レベルの引数仕様を入力ストリームに
+  カテゴリーコード$12$の文字（空白文字はカテゴリーコード$10$）の列として
+  残します．したがって
   \begin{verbatim}
     \cs_set:Npn \next:nn #1#2 { x #1 y #2 }
     \cs_argument_spec:N \next:nn
   \end{verbatim}
-  leaves |#1#2| in the input stream. If the \meta{token} is
-  not a macro then \cs{scan_stop:} is left in the input stream.
+%  leaves |#1#2| in the input stream. If the \meta{token} is
+%  not a macro then \cs{scan_stop:} is left in the input stream.
+  では|#1#2|が入力ストリームに残ります．もし\meta{token}がマクロで
+  ない場合は\cs{scan_stop:}が入力ストリームに置かれます．
   \begin{texnote}
-    If the argument specification contains the string |->|, then the
-    function produces incorrect results.
+%    If the argument specification contains the string |->|, then the
+%    function produces incorrect results.
+    引数仕様が文字列|->|を含む場合，この関数は正しく動作しません．
   \end{texnote}
 \end{function}
 
@@ -1171,18 +1195,24 @@ decomposition can occur. In the latter case, all three functions leave
   \begin{syntax}
     \cs{cs_replacement_spec:N} \meta{token}
   \end{syntax}
-  If the \meta{token} is a macro, this function leaves the replacement
-  text in input stream as a string of character tokens of category
-  code $12$ (with spaces having category code $10$). Thus for example
+%  If the \meta{token} is a macro, this function leaves the replacement
+%  text in input stream as a string of character tokens of category
+%  code $12$ (with spaces having category code $10$). Thus for example
+  \meta{token}がマクロの場合，その置換テキストを入力ストリームに
+  カテゴリーコード$12$の文字（空白文字はカテゴリーコード$10$）の列として
+  残します．したがって
   \begin{verbatim}
     \cs_set:Npn \next:nn #1#2 { x #1~y #2 }
     \cs_replacement_spec:N \next:nn
   \end{verbatim}
-  leaves \verb*|x#1 y#2| in the input stream. If the \meta{token} is
-  not a macro then \cs{scan_stop:} is left in the input stream.
+%  leaves \verb*|x#1 y#2| in the input stream. If the \meta{token} is
+%  not a macro then \cs{scan_stop:} is left in the input stream.
+  では\verb*|x#1 y#2|が入力ストリームに残ります．もし\meta{token}がマクロ
+  でない場合は\cs{scan_stop:}が入力ストリームに置かれます．
   \begin{texnote}
-    If the argument specification contains the string |->|, then the
-    function produces incorrect results.
+%    If the argument specification contains the string |->|, then the
+%    function produces incorrect results.
+    引数仕様が文字列|->|を含む場合，この関数は正しく動作しません．
   \end{texnote}
 \end{function}
 
